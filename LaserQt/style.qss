@@ -1,0 +1,40 @@
+QLabel, QMessageBox {
+    font-family: STKaiti;
+    font-size: 16px;
+    color: #000000;
+}
+
+QLabel {
+    font-family: STKaiti;
+    font-size: 16px;
+}
+
+QLineEdit {
+    font-size: 14px;
+    padding: 0 0 0 5px;
+}
+
+QTextEdit {
+    font-size: 18px;
+    padding: 0 0 0 20px;
+}
+
+QProgressBar {
+    background-color: #EEEEEE;
+    border:2px solid grey;
+    border-radius: 5px;
+    text-align: center;
+}
+
+QProgressBar::chunk {
+    background-color: #CD96CD;
+}
+
+QTableWidget {
+    font-size: 12px;
+}
+
+QMessageBox {
+    width: 100px;
+    height: 100px;
+}
