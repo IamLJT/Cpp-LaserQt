@@ -11,7 +11,7 @@ string GetWorkDirectory() {
     string _os = GetOperatingSystemVersion();
     string mainDirectory;
     if (_os == "Linux") {
-        mainDirectory = "/home/summy/Qt/LaserQt";
+        mainDirectory = "/home/summy/";
     } else {
         mainDirectory = "C://";
     }
