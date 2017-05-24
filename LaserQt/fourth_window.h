@@ -14,7 +14,8 @@ public:
     ~FourthWindow();
 
 private:
-
+    void CreateMainWindow();
+    void SetWidgets();
 };
 
 #endif // FORTHWINDOW_H

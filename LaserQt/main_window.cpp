@@ -9,6 +9,14 @@ MainWindow::~MainWindow() {
 
 }
 
+void MainWindow::clear() {
+    gInputFile->clear();
+    gDataTable->clearContents();
+    gEditButton->setEnabled(false);
+    gUpdateButton->setEnabled(false);
+    gCustomPlot->clearItems();
+}
+
 void MainWindow::CreateMainWindow() {
     setMinimumSize(GetScreenSize().first, GetScreenSize().second);
     setMaximumSize(GetScreenSize().first, GetScreenSize().second);
@@ -41,27 +49,21 @@ void MainWindow::SetWidgets() {
     gDataTable->setHorizontalHeaderLabels(headers);
     gDataTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     gDataTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    gEditFlag = false;
+    gEditFlag = true;
 
     /* left-bottom layout */
     gEditButton = new QPushButton(tr("开启编辑"));
+    gEditButton->setEnabled(false);
     connect(gEditButton, SIGNAL(clicked()), this, SLOT(SlotEditTable()));
-    QPushButton * updateButton = new QPushButton(tr("更新表格"));
-    connect(updateButton, SIGNAL(clicked()), this, SLOT(SlotUpdateTable()));
-    QPushButton * nextButton = new QPushButton(tr("下一步"));
-    connect(nextButton, SIGNAL(clicked()), this, SLOT(SlotNext()));
-    QPushButton * quitButton = new QPushButton(tr("退出"));
-    connect(quitButton, SIGNAL(clicked()), this, SLOT(SlotQuit()));
+    gUpdateButton = new QPushButton(tr("更新表格"));
+    gUpdateButton->setEnabled(false);
+    connect(gUpdateButton, SIGNAL(clicked()), this, SLOT(SlotUpdateTable()));
 
     QHBoxLayout * leftBottomLayout = new QHBoxLayout;
     leftBottomLayout->addStretch();
     leftBottomLayout->addWidget(gEditButton);
     leftBottomLayout->addSpacing(40);
-    leftBottomLayout->addWidget(updateButton);
-    leftBottomLayout->addSpacing(80);
-    leftBottomLayout->addWidget(nextButton);
-    leftBottomLayout->addSpacing(40);
-    leftBottomLayout->addWidget(quitButton);
+    leftBottomLayout->addWidget(gUpdateButton);
 
     /* left layout */
     QVBoxLayout * leftLayout = new QVBoxLayout;
@@ -75,7 +77,7 @@ void MainWindow::SetWidgets() {
     gCustomPlot = new QCustomPlot;
     gCustomPlot->addGraph();
     gCustomPlot->plotLayout()->insertRow(0);
-    gCustomPlot->plotLayout()->addElement(0, 0, new QCPTextElement(gCustomPlot, tr("加工路径静态图"), QFont(font().family(), 12, QFont::Bold)));  // TODO
+    gCustomPlot->plotLayout()->addElement(0, 0, new QCPTextElement(gCustomPlot, tr("加工路径静态图"), QFont(font().family(), 12, QFont::Bold)));
     gCustomPlot->xAxis->setLabel(tr("X-板长方向(m)"));
     gCustomPlot->xAxis->setVisible(true);
     gCustomPlot->xAxis->setTickLabels(false);
@@ -84,12 +86,10 @@ void MainWindow::SetWidgets() {
     gCustomPlot->yAxis->setTickLabels(false);
 
     QVBoxLayout * rightLayout = new QVBoxLayout;
-    rightLayout->setContentsMargins(0, 44, 0, 54);
     rightLayout->addWidget(gCustomPlot);
 
     /* main layout */
     QHBoxLayout * layout = new QHBoxLayout;
-    layout->setContentsMargins(20, 20, 20, 20);
     layout->addLayout(leftLayout);
     layout->addLayout(rightLayout);
     layout->setStretchFactor(leftLayout, 1);
@@ -99,7 +99,60 @@ void MainWindow::SetWidgets() {
 }
 
 void MainWindow::Plot() {
+    double x_start, y_start, x_end, y_end, flag;
+    double x_max = gDataTable->item(0, 0)->text().toDouble(), y_max = gDataTable->item(0, 1)->text().toDouble();
+    for (int i = 0; i < gDataTable->rowCount(); ++i) {
+        for (int j = 0; j < 7; ++j) {
+            if (j == 0) {
+                x_start = gDataTable->item(i, 0)->text().toDouble();
+                if (x_start > x_max) x_max = x_start;
+            }
+            else if (j == 1) {
+                y_start = gDataTable->item(i, 1)->text().toDouble();
+                if (y_start > y_max) y_max = y_start;
+            }
+            else if (j == 2) {
+                x_end = gDataTable->item(i, 2)->text().toDouble();
+                if (x_end > x_max) x_max = x_end;
+            }
+            else if (j == 3) {
+                y_end = gDataTable->item(i, 3)->text().toDouble();
+                if (y_end > y_max) y_max = y_end;
+            }
+            else if (j == 6) {
+                flag = gDataTable->item(i, 6)->text().toDouble();
+            }
+        }
+        QCPItemLine * line = new QCPItemLine(gCustomPlot);
+        if (flag == 0.0) {
+            line->setPen(QPen(Qt::red));
+        }
+        else if (flag == 1.0) {
+            line->setPen(QPen(Qt::black));
+        }
+        QCPItemText * textLabel = new QCPItemText(gCustomPlot);
+        textLabel->setPositionAlignment(Qt::AlignTop | Qt::AlignHCenter);
+        textLabel->position->setCoords(x_start, y_start);
+        textLabel->setText(QString::number(i + 1));
+        textLabel->setFont(QFont(font().family(), 8));
+        textLabel->setPen(QPen(Qt::gray));
 
+        line->start->setCoords(x_start, y_start);
+        line->end->setCoords(x_end, y_end);
+
+        line->start->setParentAnchor(textLabel->bottom);
+        line->setHead(QCPLineEnding::esSpikeArrow);
+    }
+    gCustomPlot->xAxis->setTickLabels(true);
+    gCustomPlot->xAxis->setRange(0.0, ceil(x_max));  // TODO
+    gCustomPlot->xAxis->grid()->setPen(QPen(Qt::gray));
+    gCustomPlot->yAxis->setTickLabels(true);
+    gCustomPlot->yAxis->setRange(0.0, ceil(y_max));  // TODO
+    gCustomPlot->yAxis->grid()->setPen(QPen(Qt::gray));
+    gCustomPlot->graph(0)->setName(tr("正面加工路径(红线)\n反面加工路径(黑线)"));  // TODO
+    gCustomPlot->legend->setVisible(true);
+    gCustomPlot->replot();
+    // qApp->processEvents();  // 强制刷新界面
 }
 
 void MainWindow::SlotOpenFile() {
@@ -116,81 +169,20 @@ void MainWindow::SlotOpenFile() {
                 Sheet * sheet = book->getSheet(0);
                 if (sheet) {
                     gDataTable->setRowCount(sheet->lastRow() - 1);
-                    double x_start, y_start, x_end, y_end, flag, x_max = sheet->readNum(1, 0), y_max = sheet->readNum(1, 1);
                     for (int i = 1; i < sheet->lastRow(); ++i) {
-                        for (int j = 0; j < sheet->lastCol(); ++j) {
-                            if (j == 0) {
-                                x_start = sheet->readNum(i, 0);
-                                if (x_start > x_max) x_max = x_start;
-                            }
-                            else if (j == 1) {
-                                y_start = sheet->readNum(i, 1);
-                                if (y_start > y_max) y_max = y_start;
-                            }
-                            else if (j == 2) {
-                                x_end = sheet->readNum(i, 2);
-                                if (x_end > x_max) x_max = x_end;
-                            }
-                            else if (j == 3) {
-                                y_end = sheet->readNum(i, 3);
-                                if (y_end > y_max) y_max = y_end;
-                            }
-                            else if (j == 6) {
-                                flag = sheet->readNum(i, 6);
-                            }
+                        for (int j = 0; j < 7; ++j) {
                             QTableWidgetItem * item = new QTableWidgetItem(QString::number(sheet->readNum(i, j)));
                             item->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
                             gDataTable->setItem(i - 1, j, item);
                         }
-                        QCPItemLine * line = new QCPItemLine(gCustomPlot);
-                        if (flag == 0.0) {
-                            line->setPen(QPen(Qt::red));
-                        }
-                        else if (flag == 1.0) {
-                            line->setPen(QPen(Qt::black));
-                        }
-                        QCPItemText * textLabel = new QCPItemText(gCustomPlot);
-                        textLabel->setPositionAlignment(Qt::AlignTop | Qt::AlignHCenter);
-                        textLabel->position->setCoords(x_start, y_start);
-                        textLabel->setText(QString::number(i));
-                        textLabel->setFont(QFont(font().family(), 8));
-                        textLabel->setPen(QPen(Qt::gray));
-
-                        line->start->setCoords(x_start, y_start);
-                        line->end->setCoords(x_end, y_end);
-
-                        line->start->setParentAnchor(textLabel->bottom);
-                        line->setHead(QCPLineEnding::esSpikeArrow);
                     }
-                    gCustomPlot->xAxis->setTickLabels(true);
-                    gCustomPlot->xAxis->setRange(0.0, ceil(x_max));  // TODO
-                    gCustomPlot->xAxis->grid()->setPen(QPen(Qt::gray));
-                    gCustomPlot->yAxis->setTickLabels(true);
-                    gCustomPlot->yAxis->setRange(0.0, ceil(y_max));  // TODO
-                    gCustomPlot->yAxis->grid()->setPen(QPen(Qt::gray));
-                    gCustomPlot->graph(0)->setName(tr("正面加工路径(红线)\n反面加工路径(黑线)"));  // TODO
-                    gCustomPlot->legend->setVisible(true);
-                    gCustomPlot->replot();
-                    // qApp->processEvents();  // 强制刷新界面
                 }
                 book->release();
+                Plot();
+                gEditButton->setEnabled(true);
+                gUpdateButton->setEnabled(true);
             }
         }
-    }
-}
-
-void MainWindow::SlotNext() {
-
-}
-
-void MainWindow::SlotQuit() {
-    MyMessageBox msgBox;
-    msgBox.setText(tr("您要退出系统吗?"));
-    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-    msgBox.setDefaultButton(QMessageBox::Yes);
-    int reply = msgBox.exec();
-    if (reply == QMessageBox::Yes) {
-        QCoreApplication::exit();  // TODO
     }
 }
 

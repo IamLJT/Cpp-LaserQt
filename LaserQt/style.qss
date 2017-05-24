@@ -6,13 +6,18 @@ QLineEdit {
     font-size: 14px;
 }
 
-QPushButton {
-    background-color: #505050;
-    color: #FFFFFF;
+QTextEdit {
     border: 1px solid #000000;
-    border-radius: 4px;
+    border-radius: 2px;
+    padding: 0 0 0 5px;
+    font-size: 12px;
+}
+
+QPushButton {
+    border: 1px solid #000000;
     width: 55px;
     height: 25px;
+    border-radius: 4px;
 }
 
 QLabel, QMessageBox {

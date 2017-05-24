@@ -29,7 +29,8 @@ SOURCES += main.cpp\
     second_window.cpp \
     third_window.cpp \
     auxiliary_function.cpp \
-    qcustomplot.cpp
+    qcustomplot.cpp \
+    stack_window.cpp
 
 HEADERS  += \
     fourth_window.h \
@@ -38,7 +39,8 @@ HEADERS  += \
     third_window.h \
     auxiliary_function.h \
     my_messagebox.h \
-    qcustomplot.h
+    qcustomplot.h \
+    stack_window.h
 
 FORMS    +=
 

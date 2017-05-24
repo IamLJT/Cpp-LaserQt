@@ -1,4 +1,4 @@
-#include "main_window.h"
+#include "stack_window.h"
 #include <QApplication>
 #include <QElapsedTimer>
 #include <QFile>
@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
     }
     app.installTranslator(&translator);
 
-    MainWindow window;
+    StackWindow window;
     window.show();
     splash.finish(&window);
 

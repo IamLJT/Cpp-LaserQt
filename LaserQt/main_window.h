@@ -6,13 +6,11 @@
 #include <QFileDialog>
 #include <QHBoxLayout>
 #include <QHeaderView>
-#include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
 #include <QTableWidget>
 #include <QTableWidgetItem>
 #include <QVBoxLayout>
-#include <QVector>
 #include "auxiliary_function.h"
 #include "my_messagebox.h"
 #include "qcustomplot.h"
@@ -20,7 +18,6 @@
 #ifdef _WIN32
   #include <windows.h>
 #endif
-
 #include "libxl.h"
 
 class MainWindow : public QWidget {
@@ -29,11 +26,13 @@ class MainWindow : public QWidget {
 public:
     explicit MainWindow(QWidget * parent = 0);
     ~MainWindow();
+    void clear();
 
 private:
     QLineEdit * gInputFile;
     QTableWidget * gDataTable;
     QPushButton * gEditButton;
+    QPushButton * gUpdateButton;
     bool gEditFlag;
     QCustomPlot * gCustomPlot;
 
@@ -45,8 +44,6 @@ private slots:
     void SlotOpenFile();
     void SlotEditTable();
     void SlotUpdateTable();
-    void SlotNext();
-    void SlotQuit();
 };
 
 #endif // MAINWINDOW_H

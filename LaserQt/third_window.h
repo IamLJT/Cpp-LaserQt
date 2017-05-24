@@ -14,7 +14,8 @@ public:
     ~ThirdWindow();
 
 private:
-
+    void CreateMainWindow();
+    void SetWidgets();
 };
 
 #endif // THIRDWINDOW_H
