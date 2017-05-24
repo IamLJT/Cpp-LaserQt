@@ -1,6 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <cmath>
 #include <QCoreApplication>
 #include <QFileDialog>
 #include <QHBoxLayout>

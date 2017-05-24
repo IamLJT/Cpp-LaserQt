@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
 
     QElapsedTimer timer;
     timer.start();
-    while (timer.elapsed() < 1000) {
+    while (timer.elapsed() < 500) {
         QApplication::processEvents();
     }
 

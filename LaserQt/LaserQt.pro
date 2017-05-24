@@ -29,7 +29,6 @@ SOURCES += main.cpp\
     second_window.cpp \
     third_window.cpp \
     auxiliary_function.cpp \
-    my_messagebox.cpp \
     qcustomplot.cpp
 
 HEADERS  += \
