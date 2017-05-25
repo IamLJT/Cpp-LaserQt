@@ -1,0 +1,11 @@
+LaserQtSystem:
+    ip:
+        localhost
+    port:
+        2000
+
+ProcessMachine:
+    ip:
+        localhost
+    port:
+        2000

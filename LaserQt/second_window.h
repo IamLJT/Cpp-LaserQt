@@ -8,16 +8,17 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
+#include <QUdpSocket>
 #include <QTextEdit>
 #include <QVBoxLayout>
 #include "auxiliary_function.h"
 #include "my_messagebox.h"
 #include "qcustomplot.h"
-
 #ifdef _WIN32
   #include <windows.h>
 #endif
 #include "libxl.h"
+#include "yaml.h"
 
 class QWidget;
 
@@ -43,17 +44,26 @@ private:
     QCustomPlot * gCustomPlot;
     QTextEdit * gLogger;
     QQueue<QVector<double>> * gTaskQueue;
+    QTimer * gTimer;
+    int32_t gCounter;
+    bool gIsStop;
+    QString gProcessMachineIP;
+    int32_t gProcessMachinePort;
+    QUdpSocket * gUDPSocket;
 
     void CreateMainWindow();
     void SetWidgets();
     void InitTaskQueue();
     void Sleep(size_t msec);
+    void InitSocket();
 
 private slots:
     void SlotOpenFile();
     void SlotStartProcessing();
     void SlotStopProcessing();
     void SlotContinueProcessing();
+    void SlotUpdateTime();
+    void SlotReadPendingDatagrams();
 };
 
 #endif // SECONDWINDOW_H

@@ -1,0 +1,11 @@
+prefix=/home/summy/Cpp-LaserQt/LaserQt
+exec_prefix=${prefix}
+libdir=/home/summy/Cpp-LaserQt/LaserQt/lib
+includedir=/home/summy/Cpp-LaserQt/LaserQt/include
+
+Name: QJson
+Description: QJson is a qt-based library that maps JSON data to QVariant objects
+Version: 0.9.0
+Requires: Qt5Core
+Libs: -L${libdir} -lqjson
+Cflags: -I${includedir}

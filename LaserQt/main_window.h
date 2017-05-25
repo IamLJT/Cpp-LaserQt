@@ -14,7 +14,6 @@
 #include "auxiliary_function.h"
 #include "my_messagebox.h"
 #include "qcustomplot.h"
-
 #ifdef _WIN32
   #include <windows.h>
 #endif

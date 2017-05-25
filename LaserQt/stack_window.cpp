@@ -10,6 +10,9 @@ StackWindow::~StackWindow() {
     delete gSecondWin;
     delete gThirdWin;
     delete gFourthWin;
+    delete gStackWin;
+    delete gPrevButton;
+    delete gNextButton;
 }
 
 void StackWindow::CreateMainWindow() {

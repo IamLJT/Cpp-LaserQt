@@ -6,7 +6,11 @@ MainWindow::MainWindow(QWidget * parent) :
 }
 
 MainWindow::~MainWindow() {
-
+    delete gInputFile;
+    delete gDataTable;
+    delete gEditButton;
+    delete gUpdateButton;
+    delete gCustomPlot;
 }
 
 void MainWindow::clear() {

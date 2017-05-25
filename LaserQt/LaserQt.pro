@@ -6,7 +6,7 @@
 
 QT       += core gui
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport network datavisualization
 
 TARGET = LaserQt
 TEMPLATE = app
@@ -51,7 +51,7 @@ RESOURCES += \
 win32 {
 
 } else {
-    INCLUDEPATH = include_cpp/libxl
+    INCLUDEPATH += include_cpp/libxl
     LIBS += -L$$PWD/lib/libxl/lib64 -lxl
 
     QMAKE_LFLAGS_DEBUG = "-Wl,-rpath,$$PWD/lib/libxl/lib64/"
@@ -63,4 +63,12 @@ win32 {
 
 } else {
     LIBS += -L$$PWD/lib/qcustomplot -lqcustomplot -lqcustomplotd
+}
+
+# YAML-Cpp setting
+win32 {
+
+} else {
+    INCLUDEPATH += include_cpp/yaml-cpp
+    LIBS += -L$$PWD/lib/yaml-cpp -lyaml-cpp
 }

@@ -6,7 +6,20 @@ SecondWindow::SecondWindow(QWidget *parent) :
 }
 
 SecondWindow::~SecondWindow() {
+    delete gInputFile;
+    delete gPathIndex;
+    delete gStartCoord;
+    delete gEndCoord;
+    delete gReduction;
+    delete gThermalParameter;
+    delete gProcessingTime;
+    delete gStartProcessingButton;
+    delete gStopProcessingButton;
+    delete gContinueProcessingButton;
+    delete gCustomPlot;
+    delete gLogger;
     delete gTaskQueue;
+    delete gTimer;
 }
 
 void SecondWindow::clear() {
@@ -16,7 +29,7 @@ void SecondWindow::clear() {
     gEndCoord->clear();
     gReduction->clear();
     gThermalParameter->clear();
-    gProcessingTime->clear();
+    gProcessingTime->setText("00:00:00");
     while (!gTaskQueue->empty()) {
         gTaskQueue->dequeue();
     }
@@ -74,13 +87,20 @@ void SecondWindow::SetWidgets() {
     leftTopLayout->addWidget(new QLabel(tr("加工时间")), 6, 0);
     gProcessingTime = new QLineEdit;
     gProcessingTime->setEnabled(false);
+    gProcessingTime->setText("00:00:00");
     leftTopLayout->addWidget(gProcessingTime, 6, 1);
 
+    /* 任务队列 */
     gTaskQueue = new QQueue<QVector<double>>;
+    /* 计时器 */
+    gTimer = new QTimer;
+    connect(gTimer, SIGNAL(timeout()), this, SLOT(SlotUpdateTime()));
+    gCounter = 0;
+    gIsStop = false;
 
     /* left-middle layout */
     gLogger = new QTextEdit;
-    gLogger->setEnabled(false);
+    // gLogger->setEnabled(false);
 
     /* left-bottom layout */
     gStartProcessingButton = new QPushButton(tr("开始加工"));
@@ -151,12 +171,24 @@ void SecondWindow::InitTaskQueue() {
                     gTaskQueue->enqueue(dataCell);
                 }
             }
-            gLogger->append(tr("[+] 初始化任务队列完毕。"));
-            gLogger->append(tr("[+] 新加入")+QString::number(sheet->lastRow())+tr("项任务。"));
+            gLogger->append(tr("[+] 初始化任务队列完毕."));
+            gLogger->append(tr("[+] 新加入")+QString::number(sheet->lastRow() - 1)+tr("项任务."));
             book->release();
             gStartProcessingButton->setEnabled(true);
         }
     }
+}
+
+void SecondWindow::Sleep(size_t msec) {
+    QTime dieTime = QTime::currentTime().addMSecs(msec);
+    while (QTime::currentTime() < dieTime)
+    QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+}
+
+void SecondWindow::InitSocket() {
+    gUDPSocket = new QUdpSocket;
+    // gUDPSocket->bind(gProcessMachineIP, gProcessMachinePort);
+    connect(gUDPSocket, SIGNAL(readyRead()), this, SLOT(SlotReadPendingDatagrams()));
 }
 
 void SecondWindow::SlotOpenFile() {
@@ -169,25 +201,91 @@ void SecondWindow::SlotOpenFile() {
 
 void SecondWindow::SlotStartProcessing() {
     gStopProcessingButton->setEnabled(true);
-    while (!gTaskQueue->empty()) {
+
+    using namespace YAML;
+    Node addressConfig = LoadFile(QDir::currentPath().toStdString() + "/Cpp-LaserQt/LaserQt/yaml/socket.yaml");
+    QString localMachine = QString::fromStdString(addressConfig["LaserQtSystem"]["ip"].as<std::string>()) + ":" +
+            QString::number(addressConfig["LaserQtSystem"]["port"].as<std::int32_t>());
+    gProcessMachineIP = QString::fromStdString(addressConfig["ProcessMachine"]["ip"].as<std::string>());
+    gProcessMachinePort = addressConfig["ProcessMachine"]["port"].as<std::int32_t>();
+    QString processMachine = gProcessMachineIP + ":" + QString::number(gProcessMachinePort);
+    InitSocket();  // 初始化Socket
+
+    MyMessageBox msgBox;
+    msgBox.setText(tr("工艺规划机IP: <") + localMachine+tr(">\n主工控机IP: <") + processMachine + ">");
+    msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Cancel);
+    msgBox.setDefaultButton(QMessageBox::Save);
+    if (msgBox.exec() == QMessageBox::Save) {
+        gTimer->start(1000);  // the UpdateTime() slot is called every second.
+        while (!gIsStop && !gTaskQueue->empty()) {
+            QVector<double> dataCell = gTaskQueue->dequeue();
+            gLogger->append(tr("[+] 正在处理第") + QString::number(dataCell.at(0)) + ("项任务..."));
+            gPathIndex->setText(QString::number(dataCell.at(0)));
+            gStartCoord->setText("(" + QString::number(dataCell.at(1)) + ", " + QString::number(dataCell.at(2)) + ")");
+            gEndCoord->setText("(" + QString::number(dataCell.at(3)) + ", " + QString::number(dataCell.at(4)) + ")");
+            gReduction->setText(QString::number(dataCell.at(5)));
+            gThermalParameter->setText(QString::number(dataCell.at(6)));
+
+
+
+            Sleep(1000);
+            gLogger->append(tr("[+] 第") + QString::number(dataCell.at(0)) + ("项任务处理完毕."));
+        }
+        gTimer->stop();
+    }
+}
+
+void SecondWindow::SlotStopProcessing() {
+    gContinueProcessingButton->setEnabled(true);
+    gIsStop = true;
+}
+
+void SecondWindow::SlotContinueProcessing() {
+    gIsStop = false;
+
+    gTimer->start(1000);  // the UpdateTime() slot is called every second.
+    while (!gIsStop && !gTaskQueue->empty()) {
         QVector<double> dataCell = gTaskQueue->dequeue();
+        gLogger->append(tr("[+] 正在处理第") + QString::number(dataCell.at(0)) + ("项任务..."));
         gPathIndex->setText(QString::number(dataCell.at(0)));
         gStartCoord->setText("(" + QString::number(dataCell.at(1)) + ", " + QString::number(dataCell.at(2)) + ")");
         gEndCoord->setText("(" + QString::number(dataCell.at(3)) + ", " + QString::number(dataCell.at(4)) + ")");
         gReduction->setText(QString::number(dataCell.at(5)));
         gThermalParameter->setText(QString::number(dataCell.at(6)));
         Sleep(1000);
+        gLogger->append(tr("[+] 第") + QString::number(dataCell.at(0)) + ("项任务处理完毕."));
     }
+    gTimer->stop();
 }
 
-void SecondWindow::SlotStopProcessing() {
-    gContinueProcessingButton->setEnabled(true);
+void SecondWindow::SlotUpdateTime() {
+    // QDateTime time = QDateTime::currentDateTime();
+    // gProcessingTime->setText(time.toString("hh:mm:ss"));
+    gCounter++;
+    int h = gCounter / 3600;
+    int m = (gCounter % 3600) / 60;
+    int s = gCounter % 60;
+
+    QString h_str;
+    if (h < 10) {
+        h_str = "0" + QString::number(h);
+    } else {
+        h_str = QString::number(h);
+    }
+    QString m_str;
+    if (m < 10) {
+        m_str = "0" + QString::number(m);
+    } else {
+        m_str = QString::number(m);
+    }
+    QString s_str;
+    if (s < 10) {
+        s_str = "0" + QString::number(s);
+    } else {
+        s_str = QString::number(s);
+    }
+
+    gProcessingTime->setText(h_str + ":" + m_str + ":" + s_str);
 }
 
-void SecondWindow::SlotContinueProcessing() {}
-
-void SecondWindow::Sleep(size_t msec) {
-    QTime dieTime = QTime::currentTime().addMSecs(msec);
-    while (QTime::currentTime() < dieTime)
-    QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
-}
+void SecondWindow::SlotReadPendingDatagrams() {}
