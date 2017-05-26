@@ -109,23 +109,28 @@ void MainWindow::SetWidgets() {
 void MainWindow::Plot() {
     double x_start, y_start, x_end, y_end, flag;
     double x_max = gDataTable->item(0, 0)->text().toDouble(), y_max = gDataTable->item(0, 1)->text().toDouble();
+    double x_min = gDataTable->item(0, 0)->text().toDouble(), y_min = gDataTable->item(0, 1)->text().toDouble();
     for (int i = 0; i < gDataTable->rowCount(); ++i) {
         for (int j = 0; j < 7; ++j) {
             if (j == 0) {
                 x_start = gDataTable->item(i, 0)->text().toDouble();
                 if (x_start > x_max) x_max = x_start;
+                if (x_start < x_min) x_min = x_start;
             }
             else if (j == 1) {
                 y_start = gDataTable->item(i, 1)->text().toDouble();
                 if (y_start > y_max) y_max = y_start;
+                if (y_start < x_min) y_min = y_start;
             }
             else if (j == 2) {
                 x_end = gDataTable->item(i, 2)->text().toDouble();
                 if (x_end > x_max) x_max = x_end;
+                if (x_end < x_min) y_min = x_end;
             }
             else if (j == 3) {
                 y_end = gDataTable->item(i, 3)->text().toDouble();
                 if (y_end > y_max) y_max = y_end;
+                if (y_end < x_min) y_min = y_end;
             }
             else if (j == 6) {
                 flag = gDataTable->item(i, 6)->text().toDouble();
@@ -152,15 +157,12 @@ void MainWindow::Plot() {
         line->setHead(QCPLineEnding::esSpikeArrow);
     }
     gCustomPlot->xAxis->setTickLabels(true);
-    gCustomPlot->xAxis->setRange(0.0, ceil(x_max));  // TODO
-    // gCustomPlot->xAxis->grid()->setPen(QPen(Qt::gray));
+    gCustomPlot->xAxis->setRange(floor(x_min), ceil(x_max));  // TODO
     gCustomPlot->yAxis->setTickLabels(true);
-    gCustomPlot->yAxis->setRange(0.0, ceil(y_max));  // TODO
-    // gCustomPlot->yAxis->grid()->setPen(QPen(Qt::gray));
+    gCustomPlot->yAxis->setRange(floor(y_min), ceil(y_max));  // TODO
     gCustomPlot->graph(0)->setName(tr("正面加工路径(红线)\n反面加工路径(黑线)"));  // TODO
     gCustomPlot->legend->setVisible(true);
     gCustomPlot->replot();
-    // qApp->processEvents();  // 强制刷新界面
 }
 
 void MainWindow::SlotOpenFile() {

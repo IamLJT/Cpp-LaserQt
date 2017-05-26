@@ -16,8 +16,8 @@ StackWindow::~StackWindow() {
 }
 
 void StackWindow::CreateMainWindow() {
-    setMinimumSize(1280, 720);
-    setMaximumSize(1280, 720);
+    setMinimumSize(1280, 680);
+    setMaximumSize(1280, 680);
 
     SetWidgets();
 }
@@ -74,7 +74,7 @@ void StackWindow::SlotPrev() {
     }
     else if (gStackWinIndex == 3) {
         gNextButton->setEnabled(true);
-        gStackWinIndex--;
+        gStackWinIndex -= 2;
         gStackWin->setCurrentIndex(gStackWinIndex);
     }
 }

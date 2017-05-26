@@ -45,6 +45,7 @@ private:
     QCustomPlot * gCustomPlot;
     QTextEdit * gLogger;
     QQueue<QVector<double>> * gTaskQueue;
+    QVector<QVector<double>> * gTaskList;
     QTimer * gTimer;
     int32_t gCounter;
     bool gIsStop;

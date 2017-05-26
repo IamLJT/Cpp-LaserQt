@@ -20,6 +20,7 @@ SecondWindow::~SecondWindow() {
     delete gCustomPlot;
     delete gLogger;
     delete gTaskQueue;
+    delete gTaskList;
     delete gTimer;
 }
 
@@ -38,7 +39,6 @@ void SecondWindow::clear() {
     gStartProcessingButton->setEnabled(false);
     gStopProcessingButton->setEnabled(false);
     gContinueProcessingButton->setEnabled(false);
-    gCustomPlot->clearItems();
 }
 
 void SecondWindow::CreateMainWindow() {
@@ -93,6 +93,7 @@ void SecondWindow::SetWidgets() {
 
     /* 任务队列 */
     gTaskQueue = new QQueue<QVector<double>>;
+    gTaskList = new QVector<QVector<double>>;
     /* 计时器 */
     gTimer = new QTimer;
     connect(gTimer, SIGNAL(timeout()), this, SLOT(SlotUpdateTime()));
@@ -133,14 +134,17 @@ void SecondWindow::SetWidgets() {
     /* right layout */
     gCustomPlot = new QCustomPlot;
     gCustomPlot->addGraph();
+    gCustomPlot->graph(0)->setPen(QPen(QColor(255, 110, 40)));
+    gCustomPlot->graph(0)->setLineStyle(QCPGraph::lsNone);
+    gCustomPlot->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 3));
     gCustomPlot->plotLayout()->insertRow(0);
     gCustomPlot->plotLayout()->addElement(0, 0, new QCPTextElement(gCustomPlot, tr("加工路径动态图"), QFont(font().family(), 12, QFont::Bold)));
     gCustomPlot->xAxis->setLabel(tr("X-板长方向(m)"));
     gCustomPlot->xAxis->setVisible(true);
-    gCustomPlot->xAxis->setTickLabels(false);
+    gCustomPlot->xAxis->setTickLabels(true);
     gCustomPlot->yAxis->setLabel(tr("Y-板宽方向(m)"));
     gCustomPlot->yAxis->setVisible(true);
-    gCustomPlot->yAxis->setTickLabels(false);
+    gCustomPlot->yAxis->setTickLabels(true);
 
     QVBoxLayout * rightLayout = new QVBoxLayout;
     rightLayout->addWidget(gCustomPlot);
@@ -170,6 +174,7 @@ void SecondWindow::InitTaskQueue() {
                         dataCell.push_back(sheet->readNum(i, j));
                     }
                     gTaskQueue->enqueue(dataCell);
+                    gTaskList->push_back(dataCell);
                 }
             }
             gLogger->append(tr("[+] 初始化任务队列完毕."));
@@ -217,16 +222,8 @@ void SecondWindow::SlotStartProcessing() {
     msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Cancel);
     msgBox.setDefaultButton(QMessageBox::Save);
     if (msgBox.exec() == QMessageBox::Save) {
-        gTimer->start(1000);  // the UpdateTime() slot is called every second.
-        while (!gIsStop && !gTaskQueue->empty()) {
+        while (!gTaskQueue->empty()) {
             QVector<double> dataCell = gTaskQueue->dequeue();
-            gLogger->append(tr("[+] 正在处理第") + QString::number(dataCell.at(0)) + ("项任务..."));
-            gPathIndex->setText(QString::number(dataCell.at(0)));
-            gStartCoord->setText("(" + QString::number(dataCell.at(1)) + ", " + QString::number(dataCell.at(2)) + ")");
-            gEndCoord->setText("(" + QString::number(dataCell.at(3)) + ", " + QString::number(dataCell.at(4)) + ")");
-            gReduction->setText(QString::number(dataCell.at(5)));
-            gThermalParameter->setText(QString::number(dataCell.at(6)));
-
             QVariantList array;
             array << int(dataCell.at(0)) << dataCell.at(1) << dataCell.at(2) << dataCell.at(3);
             array << dataCell.at(4) << int(dataCell.at(5)) << int(dataCell.at(6)) << int(dataCell.at(7));
@@ -238,10 +235,9 @@ void SecondWindow::SlotStartProcessing() {
                 gUDPSocket->writeDatagram(json.data(), json.size(), hostAddress, gProcessMachinePort);  // 发送数据包
             }
 
-            Sleep(1000);
-            gLogger->append(tr("[+] 第") + QString::number(dataCell.at(0)) + ("项任务处理完毕."));
+            Sleep(10);  // TODO
         }
-        gTimer->stop();
+        gTimer->start(1000);  // the UpdateTime() slot is called every second.
     }
 }
 
@@ -285,6 +281,7 @@ void SecondWindow::SlotUpdateTime() {
 }
 
 void SecondWindow::SlotReadPendingDatagrams() {
+    static int pathIndex_ = 0;
     while (gUDPSocket->hasPendingDatagrams()) {
         QByteArray datagram;
         datagram.resize(gUDPSocket->pendingDatagramSize());
@@ -295,6 +292,33 @@ void SecondWindow::SlotReadPendingDatagrams() {
         QJson::Parser parser;
         bool ok;
         QVariantList data = parser.parse (datagram, &ok).toList();
-        qDebug() << data[0].toDouble() << " " << data[1].toDouble() << " " << data[2].toInt() << " " << data[3].toInt();
+        double x = data[0].toDouble();
+        double y = data[1].toDouble();
+        int pathIndex = data[2].toInt();
+        int flag = data[3].toInt();
+        if (pathIndex == gTaskList->size() + 1) {
+            gLogger->append(tr("[+] 第") + QString::number(pathIndex - 1) + ("项任务处理完毕."));
+            gTimer->stop();
+        }
+        else {
+            if (pathIndex != pathIndex_) {
+                pathIndex_ = pathIndex;
+                QVector<double> dataCell = gTaskList->at(pathIndex_ - 1);
+                if (pathIndex_ == 1) {
+                    gLogger->append(tr("[+] 正在处理第") + QString::number(dataCell.at(0)) + ("项任务..."));
+                } else {
+                    gLogger->append(tr("[+] 第") + QString::number(dataCell.at(0) - 1) + ("项任务处理完毕."));
+                    gLogger->append(tr("[+] 正在处理第") + QString::number(dataCell.at(0)) + ("项任务..."));
+                }
+                gPathIndex->setText(QString::number(dataCell.at(0)));
+                gStartCoord->setText("(" + QString::number(dataCell.at(1)) + ", " + QString::number(dataCell.at(2)) + ")");
+                gEndCoord->setText("(" + QString::number(dataCell.at(3)) + ", " + QString::number(dataCell.at(4)) + ")");
+                gReduction->setText(QString::number(dataCell.at(5)));
+                gThermalParameter->setText(QString::number(dataCell.at(6)));
+            }
+            gCustomPlot->graph(0)->addData(x, y);
+            gCustomPlot->graph(0)->rescaleAxes();
+            gCustomPlot->replot();
+        }
     }
 }
