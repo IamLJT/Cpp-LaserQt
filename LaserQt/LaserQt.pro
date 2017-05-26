@@ -72,7 +72,7 @@ win32 {
 
 } else {
     INCLUDEPATH += include_cpp/yaml-cpp
-    LIBS += -L/usr/local/lib -lyaml-cpp
+    LIBS += -L$$PWD/lib/yaml-cpp -lyaml-cpp
 }
 
 # QJson setting
