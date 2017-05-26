@@ -30,7 +30,8 @@ SOURCES += main.cpp\
     third_window.cpp \
     auxiliary_function.cpp \
     qcustomplot.cpp \
-    stack_window.cpp
+    stack_window.cpp \
+    custom_qlabel.cpp
 
 HEADERS  += \
     fourth_window.h \
@@ -40,7 +41,8 @@ HEADERS  += \
     auxiliary_function.h \
     my_messagebox.h \
     qcustomplot.h \
-    stack_window.h
+    stack_window.h \
+    custom_qlabel.h
 
 FORMS    +=
 
@@ -71,4 +73,12 @@ win32 {
 } else {
     INCLUDEPATH += include_cpp/yaml-cpp
     LIBS += -L$$PWD/lib/yaml-cpp -lyaml-cpp
+}
+
+# QJson setting
+win32 {
+
+} else {
+    INCLUDEPATH += include_cpp/qjson
+    LIBS += -L$$PWD/lib/qjson -lqjson-qt5
 }

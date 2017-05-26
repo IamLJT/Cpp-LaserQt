@@ -41,6 +41,11 @@ QProgressBar::chunk {
     background-color: #CD96CD;
 }
 
+QComboBox {
+    width: 100px;
+    height: 25px;
+}
+
 QTableWidget {
     font-size: 12px;
 }

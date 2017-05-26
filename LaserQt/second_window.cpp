@@ -1,4 +1,5 @@
 #include "second_window.h"
+#include "QDebug"
 
 SecondWindow::SecondWindow(QWidget *parent) :
     QWidget(parent) {
@@ -187,7 +188,8 @@ void SecondWindow::Sleep(size_t msec) {
 
 void SecondWindow::InitSocket() {
     gUDPSocket = new QUdpSocket;
-    // gUDPSocket->bind(gProcessMachineIP, gProcessMachinePort);
+    hostAddress.setAddress(gProcessMachineIP);
+    gUDPSocket->bind(hostAddress, gProcessMachinePort);
     connect(gUDPSocket, SIGNAL(readyRead()), this, SLOT(SlotReadPendingDatagrams()));
 }
 
@@ -202,12 +204,11 @@ void SecondWindow::SlotOpenFile() {
 void SecondWindow::SlotStartProcessing() {
     gStopProcessingButton->setEnabled(true);
 
-    using namespace YAML;
-    Node addressConfig = LoadFile(QDir::currentPath().toStdString() + "/Cpp-LaserQt/LaserQt/yaml/socket.yaml");
+    YAML::Node addressConfig = YAML::LoadFile(QDir::currentPath().toStdString() + "/Cpp-LaserQt/LaserQt/yaml/socket.yaml");
     QString localMachine = QString::fromStdString(addressConfig["LaserQtSystem"]["ip"].as<std::string>()) + ":" +
-            QString::number(addressConfig["LaserQtSystem"]["port"].as<std::int32_t>());
+            QString::number(addressConfig["LaserQtSystem"]["port"].as<std::int16_t>());
     gProcessMachineIP = QString::fromStdString(addressConfig["ProcessMachine"]["ip"].as<std::string>());
-    gProcessMachinePort = addressConfig["ProcessMachine"]["port"].as<std::int32_t>();
+    gProcessMachinePort = addressConfig["ProcessMachine"]["port"].as<std::int16_t>();
     QString processMachine = gProcessMachineIP + ":" + QString::number(gProcessMachinePort);
     InitSocket();  // 初始化Socket
 
@@ -226,7 +227,16 @@ void SecondWindow::SlotStartProcessing() {
             gReduction->setText(QString::number(dataCell.at(5)));
             gThermalParameter->setText(QString::number(dataCell.at(6)));
 
+            QVariantList array;
+            array << int(dataCell.at(0)) << dataCell.at(1) << dataCell.at(2) << dataCell.at(3);
+            array << dataCell.at(4) << int(dataCell.at(5)) << int(dataCell.at(6)) << int(dataCell.at(7));
 
+            QJson::Serializer serializer;
+            bool ok;
+            QByteArray json = serializer.serialize(array, &ok);
+            if (ok) {
+                gUDPSocket->writeDatagram(json.data(), json.size(), hostAddress, gProcessMachinePort);  // 发送数据包
+            }
 
             Sleep(1000);
             gLogger->append(tr("[+] 第") + QString::number(dataCell.at(0)) + ("项任务处理完毕."));
@@ -242,20 +252,6 @@ void SecondWindow::SlotStopProcessing() {
 
 void SecondWindow::SlotContinueProcessing() {
     gIsStop = false;
-
-    gTimer->start(1000);  // the UpdateTime() slot is called every second.
-    while (!gIsStop && !gTaskQueue->empty()) {
-        QVector<double> dataCell = gTaskQueue->dequeue();
-        gLogger->append(tr("[+] 正在处理第") + QString::number(dataCell.at(0)) + ("项任务..."));
-        gPathIndex->setText(QString::number(dataCell.at(0)));
-        gStartCoord->setText("(" + QString::number(dataCell.at(1)) + ", " + QString::number(dataCell.at(2)) + ")");
-        gEndCoord->setText("(" + QString::number(dataCell.at(3)) + ", " + QString::number(dataCell.at(4)) + ")");
-        gReduction->setText(QString::number(dataCell.at(5)));
-        gThermalParameter->setText(QString::number(dataCell.at(6)));
-        Sleep(1000);
-        gLogger->append(tr("[+] 第") + QString::number(dataCell.at(0)) + ("项任务处理完毕."));
-    }
-    gTimer->stop();
 }
 
 void SecondWindow::SlotUpdateTime() {
@@ -288,4 +284,17 @@ void SecondWindow::SlotUpdateTime() {
     gProcessingTime->setText(h_str + ":" + m_str + ":" + s_str);
 }
 
-void SecondWindow::SlotReadPendingDatagrams() {}
+void SecondWindow::SlotReadPendingDatagrams() {
+    while (gUDPSocket->hasPendingDatagrams()) {
+        QByteArray datagram;
+        datagram.resize(gUDPSocket->pendingDatagramSize());
+        QHostAddress sender;
+        quint16 senderPort;
+        gUDPSocket->readDatagram(datagram.data(), datagram.size(), &sender, &senderPort);  // TODO
+
+        QJson::Parser parser;
+        bool ok;
+        QVariantList data = parser.parse (datagram, &ok).toList();
+        qDebug() << data[0].toDouble() << " " << data[1].toDouble() << " " << data[2].toInt() << " " << data[3].toInt();
+    }
+}

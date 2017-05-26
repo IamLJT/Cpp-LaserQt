@@ -19,6 +19,10 @@ void MainWindow::clear() {
     gEditButton->setEnabled(false);
     gUpdateButton->setEnabled(false);
     gCustomPlot->clearItems();
+    gCustomPlot->xAxis->setTickLabels(false);
+    gCustomPlot->yAxis->setTickLabels(false);
+    gCustomPlot->legend->setVisible(false);
+    gCustomPlot->replot();
 }
 
 void MainWindow::CreateMainWindow() {
@@ -149,10 +153,10 @@ void MainWindow::Plot() {
     }
     gCustomPlot->xAxis->setTickLabels(true);
     gCustomPlot->xAxis->setRange(0.0, ceil(x_max));  // TODO
-    gCustomPlot->xAxis->grid()->setPen(QPen(Qt::gray));
+    // gCustomPlot->xAxis->grid()->setPen(QPen(Qt::gray));
     gCustomPlot->yAxis->setTickLabels(true);
     gCustomPlot->yAxis->setRange(0.0, ceil(y_max));  // TODO
-    gCustomPlot->yAxis->grid()->setPen(QPen(Qt::gray));
+    // gCustomPlot->yAxis->grid()->setPen(QPen(Qt::gray));
     gCustomPlot->graph(0)->setName(tr("正面加工路径(红线)\n反面加工路径(黑线)"));  // TODO
     gCustomPlot->legend->setVisible(true);
     gCustomPlot->replot();

@@ -28,10 +28,12 @@ private:
     QLineEdit * gObjectDataFile;
     QLineEdit * gScanningDataFile;
     QTextEdit * gLogger;
+    QProgressBar * gExecuteProgressBar;
+    QComboBox * gCameraPresentList;
     QPushButton * gPointCloudDataScanningButton;
     QPushButton * gPointCloudDataDenoisingButton;
     QPushButton * gPointCloudDataFittingButton;
-    QProgressBar * gExecuteProgressBar;
+    QtDataVisualization::Q3DScatter * gPointCloudDataGraph;
 
     void CreateMainWindow();
     void SetWidgets();
@@ -42,6 +44,7 @@ private slots:
     void SlotScanPointCloudData();
     void SlotDenoisePointCloudData();
     void SlotFitPointCloudData();
+    void SlotAdjustCameraPresent();
 };
 
 #endif // THIRDWINDOW_H

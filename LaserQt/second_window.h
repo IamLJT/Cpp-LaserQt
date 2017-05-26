@@ -19,6 +19,7 @@
 #endif
 #include "libxl.h"
 #include "yaml.h"
+#include "QJson"
 
 class QWidget;
 
@@ -48,8 +49,10 @@ private:
     int32_t gCounter;
     bool gIsStop;
     QString gProcessMachineIP;
-    int32_t gProcessMachinePort;
+    int16_t gProcessMachinePort;
+    QHostAddress hostAddress;
     QUdpSocket * gUDPSocket;
+    bool recvDone;
 
     void CreateMainWindow();
     void SetWidgets();

@@ -11,6 +11,8 @@
         <file>ui/previous.png</file>
         <file>ui/update.png</file>
         <file>ui/browse.png</file>
+        <file>ui/arrow_left.png</file>
+        <file>ui/arrow_right.png</file>
     </qresource>
     <qresource prefix="/style">
         <file>style.qss</file>
