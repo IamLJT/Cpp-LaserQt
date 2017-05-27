@@ -22,6 +22,7 @@ class ThirdWindow : public QWidget {
 public:
     explicit ThirdWindow(QWidget *parent = 0);
     ~ThirdWindow();
+    QString CopyObjectDataFilePath();
 
 private:
     QLineEdit * gObjectDataFile;

@@ -49,6 +49,9 @@ FORMS    +=
 RESOURCES += \
     laserqt.qrc
 
+QMAKE_CXXFLAGS += -fopenmp
+LIBS += -fopenmp
+
 # libxl setting
 win32 {
 
@@ -73,4 +76,19 @@ win32 {
 } else {
     INCLUDEPATH += include_cpp/qjson
     LIBS += -L$$PWD/lib/qjson -lqjson-qt5
+}
+
+# Boost setting
+win32 {
+
+} else {
+    INCLUDEPATH += /usr/local/include/boost
+}
+
+# KDTree setting
+win32 {
+
+} else {
+    INCLUDEPATH += include_cpp/kdtree
+    LIBS += -L$$PWD/lib/kdtree -lkdtree
 }

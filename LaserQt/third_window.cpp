@@ -130,6 +130,10 @@ void ThirdWindow::SetWidgets() {
     setLayout(layout);
 }
 
+QString ThirdWindow::CopyObjectDataFilePath() {
+    return gObjectDataFile->text();
+}
+
 void ThirdWindow::SlotOpenObjectDataFile() {
     QString filePath = QFileDialog::getOpenFileName(this, tr("选择文件"), QString::fromStdString(GetWorkDirectory()), tr("Text File(*.txt)"));
     if (filePath != "") {

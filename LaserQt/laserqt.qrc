@@ -26,4 +26,7 @@
         <file>xml/config.xml</file>
         <file>xml/faro.xml</file>
     </qresource>
+    <qresource prefix="/cache">
+        <file>cache/输出数据.txt</file>
+    </qresource>
 </RCC>

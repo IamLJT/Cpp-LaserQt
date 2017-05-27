@@ -1,4 +1,13 @@
 #include "fourth_window.h"
+#include <algorithm>
+
+bool CompareX(struct estimator * a, struct estimator * b) {
+    return a->x < b->x;
+}
+
+bool CompareY(struct estimator * a, struct estimator * b) {
+    return a->y < b->y;
+}
 
 FourthWindow::FourthWindow(QWidget *parent) :
     QWidget(parent) {
@@ -12,6 +21,7 @@ FourthWindow::~FourthWindow() {
     delete gErrorCanvas_4;
     delete gErrorCanvas_5;
     delete gErrorCanvas_6;
+    delete gErrorCanvas_7;
     delete gLeftArrowLabel;
     delete gRightArrowLabel;
     delete gStackWin;
@@ -21,6 +31,10 @@ FourthWindow::~FourthWindow() {
     delete gYEnd;
     delete gOKButton;
     delete gPointCloudDataGraph;
+
+    for (size_t i = 0; i < gEstimators.size(); ++i) {
+        delete gEstimators.at(i);
+    }
 }
 
 void FourthWindow::CreateMainWindow() {
@@ -81,6 +95,20 @@ void FourthWindow::SetWidgets() {
     gErrorCanvas_6->yAxis->setVisible(true);
     gErrorCanvas_6->yAxis->setTickLabels(false);
 
+    gErrorCanvas_7 = new QtDataVisualization::Q3DScatter;
+    gErrorCanvas_7->activeTheme()->setType(QtDataVisualization::Q3DTheme::ThemeEbony);
+    gErrorCanvas_7->setShadowQuality(QtDataVisualization::QAbstract3DGraph::ShadowQualitySoftLow);
+    gErrorCanvas_7->scene()->activeCamera()->setCameraPreset(QtDataVisualization::Q3DCamera::CameraPresetDirectlyBelow);
+    gErrorCanvas_7->activeTheme()->setBackgroundColor(QColor(144, 238, 144, 127));
+    gErrorCanvas_7->activeTheme()->setBackgroundEnabled(true);
+    gErrorCanvas_7->activeTheme()->setGridEnabled(false);
+    gErrorCanvas_7->setTitle(tr("全局误差分布"));  // TODO
+    gErrorCanvas_7->axisX()->setTitle("X");
+    gErrorCanvas_7->axisX()->setTitle("Y");
+    gErrorCanvas_7->axisX()->setTitle("Err");
+
+    QWidget * globalErrorCanvas = QWidget::createWindowContainer(gErrorCanvas_7);  // It is important!
+
     gStackWin = new QStackedWidget;
     gStackWin->addWidget(gErrorCanvas_1);
     gStackWin->addWidget(gErrorCanvas_2);
@@ -88,6 +116,7 @@ void FourthWindow::SetWidgets() {
     gStackWin->addWidget(gErrorCanvas_4);
     gStackWin->addWidget(gErrorCanvas_5);
     gStackWin->addWidget(gErrorCanvas_6);
+    gStackWin->addWidget(globalErrorCanvas);
     gStackWinIndex = 0;
     gStackWin->setCurrentIndex(gStackWinIndex);
 
@@ -173,9 +202,142 @@ void FourthWindow::SetWidgets() {
     setLayout(layout);
 }
 
+void FourthWindow::CopyObjectDataFilePath(QString path) {
+    gObjectDataFile = path;
+}
+
+void FourthWindow::InitWindow() {
+    QtDataVisualization::QScatter3DSeries * series1 = new QtDataVisualization::QScatter3DSeries;
+    series1->setMeshSmooth(QtDataVisualization::QAbstract3DSeries::MeshPoint);
+    QtDataVisualization::QScatterDataArray data1;
+    QFile f1(gObjectDataFile);
+    if (f1.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QTextStream txtInput(&f1);
+        QString line;
+        QStringList items;
+        while (!txtInput.atEnd()) {
+            line = txtInput.readLine();
+            items = line.split(",");
+            data1 << QVector3D(items.at(0).toDouble(), items.at(1).toDouble(), items.at(2).toDouble());
+        }
+        f1.close();
+    }
+    series1->dataProxy()->addItems(data1);
+
+    QtDataVisualization::QScatter3DSeries * series2 = new QtDataVisualization::QScatter3DSeries;
+    series2->setMeshSmooth(QtDataVisualization::QAbstract3DSeries::MeshSphere);
+    QtDataVisualization::QScatterDataArray data2;
+    QFile f2(":/cache/cache/输出数据.txt");
+    if (f2.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QTextStream txtInput(&f2);
+        QString line;
+        QStringList items;
+        while (!txtInput.atEnd()) {
+            line = txtInput.readLine();
+            items = line.split(",");
+            data2 << QVector3D(items.at(0).toDouble(), items.at(1).toDouble(), items.at(2).toDouble());
+        }
+        f2.close();
+    }
+    series2->dataProxy()->addItems(data2);
+
+    gPointCloudDataGraph->addSeries(series1);
+    gPointCloudDataGraph->addSeries(series2);
+    InitErrorAnalysis();
+}
+
+void FourthWindow::InitErrorAnalysis() {
+    MyMessageBox msgBox;
+    msgBox.setText(tr("是否进行曲面误差评估?"));
+    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    msgBox.setDefaultButton(QMessageBox::Yes);
+    if (msgBox.exec() == QMessageBox::Yes) {
+        EstimateError();
+    }
+}
+
+void FourthWindow::EstimateError() {
+    struct kdtree * kd = kd_create(3);
+
+    QFile f1(":/cache/cache/输出数据.txt");
+    if (f1.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QTextStream txtInput(&f1);
+        QString line;
+        QStringList items;
+        while (!txtInput.atEnd()) {
+            line = txtInput.readLine();
+            items = line.split(",");
+            kd_insert3(kd, items.at(0).toDouble(), items.at(1).toDouble(), items.at(2).toDouble(), 0);
+        }
+        f1.close();
+    }
+
+    QVector<QVector3D> * points = new QVector<QVector3D>;
+    QFile f2(gObjectDataFile);
+    if (f2.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QTextStream txtInput(&f2);
+        QString line;
+        QStringList items;
+        while (!txtInput.atEnd()) {
+            line = txtInput.readLine();
+            items = line.split(",");
+            points->push_back(QVector3D(items.at(0).toDouble(), items.at(1).toDouble(), items.at(2).toDouble()));
+        }
+        f2.close();
+    }
+
+    gEstimators.resize(points->size());
+    #pragma omp parallel for num_threads(4)
+    // #pragma omp parallel for
+    for (int i = 0; i < points->size(); ++i) {
+        struct kdres * result_set = kd_nearest3(kd, points->at(i).x(), points->at(i).y(), points->at(i).z());
+        double pos[3];
+        kd_res_item(result_set, pos);
+        double err = sqrt((points->at(i).x() - pos[0]) * (points->at(i).x() - pos[0]) +
+                (points->at(i).y() - pos[1]) * (points->at(i).y() - pos[1]) +
+                (points->at(i).z() - pos[2]) * (points->at(i).z() - pos[2]));
+        struct estimator * est = new struct estimator(points->at(i).x(), points->at(i).y(), err);
+        gEstimators[i] = est;
+        kd_res_free(result_set);
+    }
+    delete points;
+
+    Generate2DMatrix();
+    PlotHeatMap();
+
+    kd_free(kd);
+}
+
+void FourthWindow::Generate2DMatrix() {
+    sort(gEstimators.begin(), gEstimators.end(), CompareX);
+    double x_flag = gEstimators.at(0)->x;
+    auto cur_it = gEstimators.begin();
+    for (auto it = gEstimators.begin(); it != gEstimators.end(); ++it) {
+        if ((*it)->x != x_flag) {
+            sort(cur_it, it, CompareY);
+            x_flag = (*it)->x;
+            cur_it = it;
+        }
+    }
+}
+
+void FourthWindow::PlotHeatMap() {
+    QtDataVisualization::QScatter3DSeries * series = new QtDataVisualization::QScatter3DSeries;
+    series->setMeshSmooth(QtDataVisualization::QAbstract3DSeries::MeshSphere);
+    QtDataVisualization::QScatterDataArray data;
+
+    for (size_t i = 0; i < gEstimators.size(); ++i) {
+        data << QVector3D(gEstimators.at(i)->x, gEstimators.at(i)->y, gEstimators.at(i)->err);
+    }
+
+    series->dataProxy()->addItems(data);
+
+    gErrorCanvas_7->addSeries(series);
+}
+
 void FourthWindow::SlotLeftArrowClicked() {
     if (gStackWinIndex == 0) {
-        gStackWinIndex = 5;
+        gStackWinIndex = 6;
     } else {
         gStackWinIndex--;
     }
@@ -200,7 +362,7 @@ void FourthWindow::SlotLeftArrowClicked() {
 }
 
 void FourthWindow::SlotRightArrowClicked() {
-    if (gStackWinIndex == 5) {
+    if (gStackWinIndex == 6) {
         gStackWinIndex = 0;
     } else {
         gStackWinIndex++;

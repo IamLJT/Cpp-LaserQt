@@ -95,6 +95,8 @@ void StackWindow::SlotNext() {
         gNextButton->setEnabled(false);
         gStackWinIndex++;
         gStackWin->setCurrentIndex(gStackWinIndex);
+        gFourthWin->CopyObjectDataFilePath(gThirdWin->CopyObjectDataFilePath());
+        gFourthWin->InitWindow();
     }
     else if (gStackWinIndex == 3) {
     }
