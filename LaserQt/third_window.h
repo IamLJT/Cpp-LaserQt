@@ -13,7 +13,6 @@
 #include "auxiliary_function.h"
 #include "my_messagebox.h"
 #include "qcustomplot.h"
-#include "yaml.h"
 
 class QWidget;
 

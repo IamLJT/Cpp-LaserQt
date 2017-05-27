@@ -209,16 +209,27 @@ void SecondWindow::SlotOpenFile() {
 void SecondWindow::SlotStartProcessing() {
     gStopProcessingButton->setEnabled(true);
 
-    YAML::Node addressConfig = YAML::LoadFile(QDir::currentPath().toStdString() + "/Cpp-LaserQt/LaserQt/yaml/socket.yaml");
-    QString localMachine = QString::fromStdString(addressConfig["LaserQtSystem"]["ip"].as<std::string>()) + ":" +
-            QString::number(addressConfig["LaserQtSystem"]["port"].as<std::int16_t>());
-    gProcessMachineIP = QString::fromStdString(addressConfig["ProcessMachine"]["ip"].as<std::string>());
-    gProcessMachinePort = addressConfig["ProcessMachine"]["port"].as<std::int16_t>();
+    QFile fd(":/xml/xml/config.xml");
+    if (fd.open(QFile::ReadOnly | QFile::Text)) {
+        QXmlStreamReader * reader = new QXmlStreamReader(&fd);
+        while (!reader->atEnd()) {
+            reader->readNext();
+            if (reader->name() == "hostname") {
+                gProcessMachineIP = reader->readElementText();
+            }
+            else if (reader->name() == "port") {
+                gProcessMachinePort = reader->readElementText().toUShort();
+            }
+        }
+        delete reader;
+        fd.close();
+    }
+
     QString processMachine = gProcessMachineIP + ":" + QString::number(gProcessMachinePort);
     InitSocket();  // 初始化Socket
 
     MyMessageBox msgBox;
-    msgBox.setText(tr("工艺规划机IP: <") + localMachine+tr(">\n主工控机IP: <") + processMachine + ">");
+    msgBox.setText(tr("主工控机: <") + processMachine + ">");
     msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Cancel);
     msgBox.setDefaultButton(QMessageBox::Save);
     if (msgBox.exec() == QMessageBox::Save) {

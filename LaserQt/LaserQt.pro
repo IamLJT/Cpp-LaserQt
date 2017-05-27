@@ -6,7 +6,7 @@
 
 QT       += core gui
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport network datavisualization
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport network datavisualization xml
 
 TARGET = LaserQt
 TEMPLATE = app
@@ -65,14 +65,6 @@ win32 {
 
 } else {
     LIBS += -L$$PWD/lib/qcustomplot -lqcustomplot -lqcustomplotd
-}
-
-# YAML-Cpp setting
-win32 {
-
-} else {
-    INCLUDEPATH += include_cpp/yaml-cpp
-    LIBS += -L$$PWD/lib/yaml-cpp -lyaml-cpp
 }
 
 # QJson setting

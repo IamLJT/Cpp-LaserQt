@@ -11,6 +11,7 @@
 #include <QUdpSocket>
 #include <QTextEdit>
 #include <QVBoxLayout>
+#include <QtXml>
 #include "auxiliary_function.h"
 #include "my_messagebox.h"
 #include "qcustomplot.h"
@@ -18,7 +19,6 @@
   #include <windows.h>
 #endif
 #include "libxl.h"
-#include "yaml.h"
 #include "QJson"
 
 class QWidget;

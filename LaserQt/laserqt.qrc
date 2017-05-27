@@ -22,4 +22,8 @@
         <file>font/qt_zh_CN.qm</file>
         <file>font/qt_zh_TW.qm</file>
     </qresource>
+    <qresource prefix="/xml">
+        <file>xml/config.xml</file>
+        <file>xml/faro.xml</file>
+    </qresource>
 </RCC>
