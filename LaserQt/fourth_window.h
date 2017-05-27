@@ -37,13 +37,10 @@ public:
     void InitWindow();
 
 private:
-    QCustomPlot * gErrorCanvas_1;
-    QCustomPlot * gErrorCanvas_2;
-    QCustomPlot * gErrorCanvas_3;
-    QCustomPlot * gErrorCanvas_4;
-    QCustomPlot * gErrorCanvas_5;
-    QCustomPlot * gErrorCanvas_6;
-    QtDataVisualization::Q3DScatter * gErrorCanvas_7;
+    QCustomPlot * gErrorCanvas_00;
+    QCustomPlot * gErrorCanvas_01;
+    QCustomPlot * gErrorCanvas_02;
+    QtDataVisualization::Q3DScatter * gErrorCanvas_03;
     ClickedQLabel * gLeftArrowLabel;
     ClickedQLabel * gRightArrowLabel;
     QStackedWidget * gStackWin;
@@ -61,7 +58,8 @@ private:
     void SetWidgets();
     void InitErrorAnalysis();
     void EstimateError();
-    void Generate2DMatrix();
+    void Generate2DMatrixAccordingToX();
+    void Generate2DMatrixAccordingToY();
     void PlotHeatMap();
 
 private slots:

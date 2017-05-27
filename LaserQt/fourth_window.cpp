@@ -15,13 +15,10 @@ FourthWindow::FourthWindow(QWidget *parent) :
 }
 
 FourthWindow::~FourthWindow() {
-    delete gErrorCanvas_1;
-    delete gErrorCanvas_2;
-    delete gErrorCanvas_3;
-    delete gErrorCanvas_4;
-    delete gErrorCanvas_5;
-    delete gErrorCanvas_6;
-    delete gErrorCanvas_7;
+    delete gErrorCanvas_00;
+    delete gErrorCanvas_01;
+    delete gErrorCanvas_02;
+    delete gErrorCanvas_03;
     delete gLeftArrowLabel;
     delete gRightArrowLabel;
     delete gStackWin;
@@ -46,76 +43,46 @@ void FourthWindow::CreateMainWindow() {
 
 void FourthWindow::SetWidgets() {
     /* left-top layout */
-    gErrorCanvas_1 = new QCustomPlot;
-    gErrorCanvas_1->addGraph();
-    gErrorCanvas_1->plotLayout()->insertRow(0);
-    gErrorCanvas_1->plotLayout()->addElement(0, 0, new QCPTextElement(gErrorCanvas_1, tr("加工板水平方向1/3处误差曲线图"), QFont(font().family(), 10, QFont::Bold)));
-    gErrorCanvas_1->xAxis->setVisible(true);
-    gErrorCanvas_1->xAxis->setTickLabels(false);
-    gErrorCanvas_1->yAxis->setVisible(true);
-    gErrorCanvas_1->yAxis->setTickLabels(false);
-    gErrorCanvas_2 = new QCustomPlot;
-    gErrorCanvas_2->addGraph();
-    gErrorCanvas_2->plotLayout()->insertRow(0);
-    gErrorCanvas_2->plotLayout()->addElement(0, 0, new QCPTextElement(gErrorCanvas_2, tr("加工板水平方向1/2处误差曲线图"), QFont(font().family(), 10, QFont::Bold)));
-    gErrorCanvas_2->xAxis->setVisible(true);
-    gErrorCanvas_2->xAxis->setTickLabels(false);
-    gErrorCanvas_2->yAxis->setVisible(true);
-    gErrorCanvas_2->yAxis->setTickLabels(false);
-    gErrorCanvas_3 = new QCustomPlot;
-    gErrorCanvas_3->addGraph();
-    gErrorCanvas_3->plotLayout()->insertRow(0);
-    gErrorCanvas_3->plotLayout()->addElement(0, 0, new QCPTextElement(gErrorCanvas_3, tr("加工板水平方向2/3处误差曲线图"), QFont(font().family(), 10, QFont::Bold)));
-    gErrorCanvas_3->xAxis->setVisible(true);
-    gErrorCanvas_3->xAxis->setTickLabels(false);
-    gErrorCanvas_3->yAxis->setVisible(true);
-    gErrorCanvas_3->yAxis->setTickLabels(false);
-    gErrorCanvas_4 = new QCustomPlot;
-    gErrorCanvas_4->addGraph();
-    gErrorCanvas_4->plotLayout()->insertRow(0);
-    gErrorCanvas_4->plotLayout()->addElement(0, 0, new QCPTextElement(gErrorCanvas_4, tr("加工板垂直方向1/3处误差曲线图"), QFont(font().family(), 10, QFont::Bold)));
-    gErrorCanvas_4->xAxis->setVisible(true);
-    gErrorCanvas_4->xAxis->setTickLabels(false);
-    gErrorCanvas_4->yAxis->setVisible(true);
-    gErrorCanvas_4->yAxis->setTickLabels(false);
-    gErrorCanvas_5 = new QCustomPlot;
-    gErrorCanvas_5->addGraph();
-    gErrorCanvas_5->plotLayout()->insertRow(0);
-    gErrorCanvas_5->plotLayout()->addElement(0, 0, new QCPTextElement(gErrorCanvas_5, tr("加工板垂直方向2/3处误差曲线图"), QFont(font().family(), 10, QFont::Bold)));
-    gErrorCanvas_5->xAxis->setVisible(true);
-    gErrorCanvas_5->xAxis->setTickLabels(false);
-    gErrorCanvas_5->yAxis->setVisible(true);
-    gErrorCanvas_5->yAxis->setTickLabels(false);
-    gErrorCanvas_6 = new QCustomPlot;
-    gErrorCanvas_6->addGraph();
-    gErrorCanvas_6->plotLayout()->insertRow(0);
-    gErrorCanvas_6->plotLayout()->addElement(0, 0, new QCPTextElement(gErrorCanvas_6, tr("加工板任意两点间误差曲线图"), QFont(font().family(), 10, QFont::Bold)));
-    gErrorCanvas_6->xAxis->setVisible(true);
-    gErrorCanvas_6->xAxis->setTickLabels(false);
-    gErrorCanvas_6->yAxis->setVisible(true);
-    gErrorCanvas_6->yAxis->setTickLabels(false);
+    gErrorCanvas_00 = new QCustomPlot;
+    gErrorCanvas_00->addGraph();
+    gErrorCanvas_00->graph(0)->setPen(QPen(QColor(255, 110, 40)));
+    gErrorCanvas_00->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 4));
+    gErrorCanvas_00->plotLayout()->insertRow(0);
+    gErrorCanvas_00->plotLayout()->addElement(0, 0, new QCPTextElement(gErrorCanvas_00, tr("水平方向局部误差图"), QFont(font().family(), 10, QFont::Bold)));
+    gErrorCanvas_00->xAxis->setVisible(true);
+    gErrorCanvas_00->xAxis->setTickLabels(false);
+    gErrorCanvas_00->yAxis->setVisible(true);
+    gErrorCanvas_00->yAxis->setTickLabels(false);
+    gErrorCanvas_01 = new QCustomPlot;
+    gErrorCanvas_01->addGraph();
+    gErrorCanvas_01->plotLayout()->insertRow(0);
+    gErrorCanvas_01->plotLayout()->addElement(0, 0, new QCPTextElement(gErrorCanvas_01, tr("垂直方向局部误差图"), QFont(font().family(), 10, QFont::Bold)));
+    gErrorCanvas_01->xAxis->setVisible(true);
+    gErrorCanvas_01->xAxis->setTickLabels(false);
+    gErrorCanvas_01->yAxis->setVisible(true);
+    gErrorCanvas_01->yAxis->setTickLabels(false);
+    gErrorCanvas_02 = new QCustomPlot;
+    gErrorCanvas_02->addGraph();
+    gErrorCanvas_02->plotLayout()->insertRow(0);
+    gErrorCanvas_02->plotLayout()->addElement(0, 0, new QCPTextElement(gErrorCanvas_02, tr("任意两点间误差图"), QFont(font().family(), 10, QFont::Bold)));
+    gErrorCanvas_02->xAxis->setVisible(true);
+    gErrorCanvas_02->xAxis->setTickLabels(false);
+    gErrorCanvas_02->yAxis->setVisible(true);
+    gErrorCanvas_02->yAxis->setTickLabels(false);
 
-    gErrorCanvas_7 = new QtDataVisualization::Q3DScatter;
-    gErrorCanvas_7->activeTheme()->setType(QtDataVisualization::Q3DTheme::ThemeEbony);
-    gErrorCanvas_7->setShadowQuality(QtDataVisualization::QAbstract3DGraph::ShadowQualitySoftLow);
-    gErrorCanvas_7->scene()->activeCamera()->setCameraPreset(QtDataVisualization::Q3DCamera::CameraPresetDirectlyBelow);
-    gErrorCanvas_7->activeTheme()->setBackgroundColor(QColor(144, 238, 144, 127));
-    gErrorCanvas_7->activeTheme()->setBackgroundEnabled(true);
-    gErrorCanvas_7->activeTheme()->setGridEnabled(false);
-    gErrorCanvas_7->setTitle(tr("全局误差分布"));  // TODO
-    gErrorCanvas_7->axisX()->setTitle("X");
-    gErrorCanvas_7->axisX()->setTitle("Y");
-    gErrorCanvas_7->axisX()->setTitle("Err");
+    gErrorCanvas_03 = new QtDataVisualization::Q3DScatter;
+    gErrorCanvas_03->activeTheme()->setType(QtDataVisualization::Q3DTheme::ThemeQt);
+    gErrorCanvas_03->setShadowQuality(QtDataVisualization::QAbstract3DGraph::ShadowQualitySoftLow);
+    gErrorCanvas_03->scene()->activeCamera()->setCameraPreset(QtDataVisualization::Q3DCamera::CameraPresetDirectlyAbove);
+    gErrorCanvas_03->activeTheme()->setGridEnabled(false);
+    gErrorCanvas_03->setTitle(tr("全局误差分布"));  // TODO
 
-    QWidget * globalErrorCanvas = QWidget::createWindowContainer(gErrorCanvas_7);  // It is important!
+    QWidget * globalErrorCanvas = QWidget::createWindowContainer(gErrorCanvas_03);  // It is important!
 
     gStackWin = new QStackedWidget;
-    gStackWin->addWidget(gErrorCanvas_1);
-    gStackWin->addWidget(gErrorCanvas_2);
-    gStackWin->addWidget(gErrorCanvas_3);
-    gStackWin->addWidget(gErrorCanvas_4);
-    gStackWin->addWidget(gErrorCanvas_5);
-    gStackWin->addWidget(gErrorCanvas_6);
+    gStackWin->addWidget(gErrorCanvas_00);
+    gStackWin->addWidget(gErrorCanvas_01);
+    gStackWin->addWidget(gErrorCanvas_02);
     gStackWin->addWidget(globalErrorCanvas);
     gStackWinIndex = 0;
     gStackWin->setCurrentIndex(gStackWinIndex);
@@ -287,8 +254,8 @@ void FourthWindow::EstimateError() {
     }
 
     gEstimators.resize(points->size());
-    #pragma omp parallel for num_threads(4)
-    // #pragma omp parallel for
+    // #pragma omp parallel for num_threads(4)
+    #pragma omp parallel for
     for (int i = 0; i < points->size(); ++i) {
         struct kdres * result_set = kd_nearest3(kd, points->at(i).x(), points->at(i).y(), points->at(i).z());
         double pos[3];
@@ -301,25 +268,51 @@ void FourthWindow::EstimateError() {
         kd_res_free(result_set);
     }
     delete points;
-
-    Generate2DMatrix();
-    PlotHeatMap();
-
     kd_free(kd);
+
+    Generate2DMatrixAccordingToX();
+    PlotHeatMap();
 }
 
-void FourthWindow::Generate2DMatrix() {
+void FourthWindow::Generate2DMatrixAccordingToX() {
     sort(gEstimators.begin(), gEstimators.end(), CompareX);
+
+    QVector<QVector2D> points;
+
     double x_flag = gEstimators.at(0)->x;
+    double err_max = gEstimators.at(0)->err;
     auto cur_it = gEstimators.begin();
+    int i = 1;
     for (auto it = gEstimators.begin(); it != gEstimators.end(); ++it) {
         if ((*it)->x != x_flag) {
-            sort(cur_it, it, CompareY);
+            points.push_back(QVector2D(i, err_max));
+            i++;
+            err_max = (*it)->err;
             x_flag = (*it)->x;
+
+            sort(cur_it, it, CompareY);
+
             cur_it = it;
+        } else {
+            if ((*it)->err > err_max) {
+                err_max = (*it)->err;
+            }
         }
     }
+
+    for (auto it = points.begin(); it != points.end(); ++it) {
+        gErrorCanvas_00->graph(0)->addData((*it).x(), (*it).y());
+    }
+    gErrorCanvas_00->xAxis->setTickLabels(true);
+    gErrorCanvas_00->xAxis->setLabel(tr("水平方向"));
+    gErrorCanvas_00->yAxis->setTickLabels(true);
+    gErrorCanvas_00->yAxis->setLabel(tr("误差(m)"));
+    gErrorCanvas_00->xAxis->setRange(1, i);
+    gErrorCanvas_00->yAxis->setRange(0, 0.1);
+    gErrorCanvas_00->replot();
 }
+
+void FourthWindow::Generate2DMatrixAccordingToY() {}
 
 void FourthWindow::PlotHeatMap() {
     QtDataVisualization::QScatter3DSeries * series = new QtDataVisualization::QScatter3DSeries;
@@ -332,17 +325,17 @@ void FourthWindow::PlotHeatMap() {
 
     series->dataProxy()->addItems(data);
 
-    gErrorCanvas_7->addSeries(series);
+    gErrorCanvas_03->addSeries(series);
 }
 
 void FourthWindow::SlotLeftArrowClicked() {
     if (gStackWinIndex == 0) {
-        gStackWinIndex = 6;
+        gStackWinIndex = 3;
     } else {
         gStackWinIndex--;
     }
     gStackWin->setCurrentIndex(gStackWinIndex);
-    if (gStackWinIndex == 5) {
+    if (gStackWinIndex == 2) {
         gXStart->setEnabled(true);
         gYStart->setEnabled(true);
         gXEnd->setEnabled(true);
@@ -362,13 +355,13 @@ void FourthWindow::SlotLeftArrowClicked() {
 }
 
 void FourthWindow::SlotRightArrowClicked() {
-    if (gStackWinIndex == 6) {
+    if (gStackWinIndex == 3) {
         gStackWinIndex = 0;
     } else {
         gStackWinIndex++;
     }
     gStackWin->setCurrentIndex(gStackWinIndex);
-    if (gStackWinIndex == 5) {
+    if (gStackWinIndex == 2) {
         gXStart->setEnabled(true);
         gYStart->setEnabled(true);
         gXEnd->setEnabled(true);
