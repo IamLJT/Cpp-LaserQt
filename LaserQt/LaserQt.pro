@@ -49,8 +49,26 @@ FORMS    +=
 RESOURCES += \
     laserqt.qrc
 
+CONFIG += axcontainer
+
 QMAKE_CXXFLAGS += -fopenmp
 LIBS += -fopenmp
+
+# QJson setting
+win32 {
+    INCLUDEPATH += include_cpp/qjson
+    LIBS += -L$$PWD/winlib/qjson -lqjson-qt5
+} else {
+    INCLUDEPATH += include_cpp/qjson
+    LIBS += -L$$PWD/lib/qjson -lqjson-qt5
+}
+
+# QCustomPlot setting
+win32 {
+    LIBS += -L$$PWD/winlib/qcustomplot/debug -lqcustomplotd2
+} else {
+    LIBS += -L$$PWD/lib/qcustomplot -lqcustomplot -lqcustomplotd
+}
 
 # libxl setting
 win32 {
@@ -63,21 +81,6 @@ win32 {
     QMAKE_LFLAGS_RELEASE = "-Wl,-rpath,$$PWD/lib/libxl/lib64/"
 }
 
-# QCustomPlot setting
-win32 {
-
-} else {
-    LIBS += -L$$PWD/lib/qcustomplot -lqcustomplot -lqcustomplotd
-}
-
-# QJson setting
-win32 {
-
-} else {
-    INCLUDEPATH += include_cpp/qjson
-    LIBS += -L$$PWD/lib/qjson -lqjson-qt5
-}
-
 # Boost setting
 win32 {
 
@@ -87,7 +90,7 @@ win32 {
 
 # KDTree setting
 win32 {
-
+    INCLUDEPATH += include_cpp/kdtree
 } else {
     INCLUDEPATH += include_cpp/kdtree
     LIBS += -L$$PWD/lib/kdtree -lkdtree

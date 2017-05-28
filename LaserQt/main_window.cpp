@@ -171,9 +171,12 @@ void MainWindow::SlotOpenFile() {
         gInputFile->setText(filePath);
         gDataTable->clearContents();
 
+        /* Linux */
+        /*
         using namespace libxl;
         Book * book = xlCreateXMLBook();
         // Book * book = xlCreateBook();  // xlCreateBook() for xls
+        book->setKey(L"Michael Hillier", L"windows-222329040ec5ec046fb46767a7h1gej6");
         if (book) {
             if (book->load(filePath.toStdString().c_str())) {
                 Sheet * sheet = book->getSheet(0);
@@ -193,6 +196,7 @@ void MainWindow::SlotOpenFile() {
                 gUpdateButton->setEnabled(true);
             }
         }
+        */
     }
 }
 
@@ -209,9 +213,12 @@ void MainWindow::SlotEditTable() {
 }
 
 void MainWindow::SlotUpdateTable() {
+    /* Linux */
+    /*
     using namespace libxl;
     Book * book = xlCreateXMLBook();
     // Book * book = xlCreateBook();  // xlCreateBook() for xls
+    book->setKey(L"Michael Hillier", L"windows-222329040ec5ec046fb46767a7h1gej6");
     if (book) {
         if (book->load(gInputFile->text().toStdString().c_str())) {
             Sheet * sheet = book->getSheet(0);
@@ -226,6 +233,7 @@ void MainWindow::SlotUpdateTable() {
             book->release();
         }
     }
+    */
 
     MyMessageBox msgBox;
     msgBox.setText(tr("更新表格完毕！"));

@@ -15,10 +15,15 @@
 #include "auxiliary_function.h"
 #include "my_messagebox.h"
 #include "qcustomplot.h"
+
+/* Linux */
+/*
 #ifdef _WIN32
   #include <windows.h>
 #endif
 #include "libxl.h"
+*/
+
 #include "QJson"
 
 class QWidget;

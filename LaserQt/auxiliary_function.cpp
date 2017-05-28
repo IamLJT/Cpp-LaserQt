@@ -18,14 +18,6 @@ string GetWorkDirectory() {
     return mainDirectory;
 }
 
-string GetCurrentTime() {
-    return "";
-}
-
-string GetCurrentDate() {
-    return "";
-}
-
 pair<int, int> GetScreenSize() {
     pair<int, int> p = make_pair(1280, 620);
     return p;
