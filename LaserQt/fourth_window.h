@@ -50,6 +50,8 @@ private:
     QLineEdit * gXEnd;
     QLineEdit * gYEnd;
     QPushButton * gOKButton;
+    QLineEdit *  gXDivide;
+    QLineEdit *  gYDivide;
     QString gObjectDataFile;
     QtDataVisualization::Q3DScatter * gPointCloudDataGraph;
     vector<struct estimator *> gEstimators;
@@ -66,6 +68,7 @@ private slots:
     void SlotLeftArrowClicked();
     void SlotRightArrowClicked();
     void SlotOK();
+    void SlotEstimate();
 };
 
 #endif // FORTHWINDOW_H

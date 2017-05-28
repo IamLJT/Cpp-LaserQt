@@ -306,7 +306,7 @@ void SecondWindow::SlotReadPendingDatagrams() {
         double x = data[0].toDouble();
         double y = data[1].toDouble();
         int pathIndex = data[2].toInt();
-        int flag = data[3].toInt();
+        // int flag = data[3].toInt();
         if (pathIndex == gTaskList->size() + 1) {
             gLogger->append(tr("[+] 第") + QString::number(pathIndex - 1) + ("项任务处理完毕."));
             gTimer->stop();

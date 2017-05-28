@@ -27,6 +27,8 @@ FourthWindow::~FourthWindow() {
     delete gXEnd;
     delete gYEnd;
     delete gOKButton;
+    delete gXDivide;
+    delete gXDivide;
     delete gPointCloudDataGraph;
 
     for (size_t i = 0; i < gEstimators.size(); ++i) {
@@ -104,7 +106,7 @@ void FourthWindow::SetWidgets() {
     /* left-middle layout */
     QGridLayout * leftMiddleLayout = new QGridLayout;
     leftMiddleLayout->setContentsMargins(70, 0, 70, 0);
-    leftMiddleLayout->setSpacing(20);
+    leftMiddleLayout->setSpacing(10);
 
     leftMiddleLayout->addWidget(new QLabel(tr("起点Ｘ坐标")), 0, 0);
     gXStart = new QLineEdit;
@@ -127,19 +129,24 @@ void FourthWindow::SetWidgets() {
     gOKButton = new QPushButton(tr("确定"));
     gOKButton->setEnabled(false);
     connect(gOKButton, SIGNAL(clicked()), this, SLOT(SlotOK()));
+    leftMiddleLayout->addWidget(gOKButton, 1, 4);
 
-    QHBoxLayout * leftBottomLayout = new QHBoxLayout;
-    leftBottomLayout->setContentsMargins(0, 0, 70, 0);
-    leftBottomLayout->addStretch();
-    leftBottomLayout->addWidget(gOKButton);
+    leftMiddleLayout->addWidget(new QLabel(tr("X方向均分")), 2, 0);
+    gXDivide = new QLineEdit;
+    leftMiddleLayout->addWidget(gXDivide, 2, 1);
+    leftMiddleLayout->addWidget(new QLabel(tr("Y方向均分")), 2, 2);
+    gYDivide = new QLineEdit;
+    leftMiddleLayout->addWidget(gYDivide, 2, 3);
+
+    QPushButton * estimateButton = new QPushButton(tr("评估"));
+    connect(estimateButton, SIGNAL(clicked()), this, SLOT(SlotEstimate()));
+    leftMiddleLayout->addWidget(estimateButton, 2, 4);
 
     /* left layout */
     QVBoxLayout * leftLayout = new QVBoxLayout;
     leftLayout->addLayout(leftTopLayout);
     leftLayout->addSpacing(30);
     leftLayout->addLayout(leftMiddleLayout);
-    leftLayout->addSpacing(10);
-    leftLayout->addLayout(leftBottomLayout);
 
     /* right layout */
     gPointCloudDataGraph = new QtDataVisualization::Q3DScatter;
@@ -381,3 +388,5 @@ void FourthWindow::SlotRightArrowClicked() {
 }
 
 void FourthWindow::SlotOK() {}
+
+void FourthWindow::SlotEstimate() {}
