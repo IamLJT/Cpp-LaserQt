@@ -91,6 +91,7 @@ win32 {
 # KDTree setting
 win32 {
     INCLUDEPATH += include_cpp/kdtree
+    LIBS += -L$$PWD/winlib/kdtree -lkdtree
 } else {
     INCLUDEPATH += include_cpp/kdtree
     LIBS += -L$$PWD/lib/kdtree -lkdtree

@@ -231,7 +231,6 @@ void FourthWindow::InitErrorAnalysis() {
 }
 
 void FourthWindow::EstimateError() {
-#ifdef __linux__
     struct kdtree * kd = kd_create(3);
 
     QFile f1(":/cache/cache/输出数据.txt");
@@ -280,7 +279,6 @@ void FourthWindow::EstimateError() {
 
     Generate2DMatrixAccordingToX();
     PlotHeatMap();
-#endif
 }
 
 void FourthWindow::Generate2DMatrixAccordingToX() {

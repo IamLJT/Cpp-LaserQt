@@ -108,7 +108,7 @@ void StackWindow::SlotQuit() {
     msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
     msgBox.setDefaultButton(QMessageBox::Yes);
     if (msgBox.exec() == QMessageBox::Yes) {
-        QCoreApplication::instance()->exit(0);  // TODO
+        QCoreApplication::exit(0);  // TODO
     }
 }
 

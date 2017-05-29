@@ -194,9 +194,9 @@ void SecondWindow::InitTaskQueue() {
             if (QXlsx::Cell * cell = xlsx.cellAt(i, j)) {
                 dataCell.push_back(cell->value().toDouble());
             }
-            gTaskQueue->enqueue(dataCell);
-            gTaskList->push_back(dataCell);
         }
+        gTaskQueue->enqueue(dataCell);
+        gTaskList->push_back(dataCell);
     }
     gLogger->append(tr("[+] 初始化任务队列完毕."));
     gLogger->append(tr("[+] 新加入")+QString::number(xlsx.dimension().lastRow() - 1)+tr("项任务."));
@@ -262,7 +262,7 @@ void SecondWindow::SlotStartProcessing() {
             bool ok;
             QByteArray json = serializer.serialize(array, &ok);
             if (ok) {
-                gUDPSocket->writeDatagram(json.data(), json.size(), hostAddress, gProcessMachinePort);  // 发送数据包
+                // gUDPSocket->writeDatagram(json.data(), json.size(), hostAddress, gProcessMachinePort);  // 发送数据包
             }
 
             Sleep(10);  // TODO
