@@ -11,18 +11,17 @@
 #include <QUdpSocket>
 #include <QTextEdit>
 #include <QVBoxLayout>
+#include <QtXlsx>
 #include <QtXml>
 #include "auxiliary_function.h"
 #include "my_messagebox.h"
 #include "qcustomplot.h"
 
-/* Linux */
-/*
 #ifdef _WIN32
   #include <windows.h>
+#elif __linux__
+  #include "libxl.h"
 #endif
-#include "libxl.h"
-*/
 
 #include "QJson"
 

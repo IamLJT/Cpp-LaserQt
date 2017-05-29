@@ -65,14 +65,14 @@ win32 {
 
 # QCustomPlot setting
 win32 {
-    LIBS += -L$$PWD/winlib/qcustomplot/debug -lqcustomplotd2
+    LIBS += -L$$PWD/winlib/qcustomplot -lqcustomplotd2
 } else {
     LIBS += -L$$PWD/lib/qcustomplot -lqcustomplot -lqcustomplotd
 }
 
 # libxl setting
 win32 {
-
+    QT += xlsx
 } else {
     INCLUDEPATH += include_cpp/libxl
     LIBS += -L$$PWD/lib/libxl/lib64 -lxl

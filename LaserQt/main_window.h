@@ -11,17 +11,16 @@
 #include <QTableWidget>
 #include <QTableWidgetItem>
 #include <QVBoxLayout>
+#include <QtXlsx>
 #include "auxiliary_function.h"
 #include "my_messagebox.h"
 #include "qcustomplot.h"
 
-/* Linux */
-/*
 #ifdef _WIN32
   #include <windows.h>
+#elif __linux__
+  #include "libxl.h"
 #endif
-#include "libxl.h"
-*/
 
 class MainWindow : public QWidget {
     Q_OBJECT

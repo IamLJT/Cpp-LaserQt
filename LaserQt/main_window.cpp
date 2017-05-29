@@ -1,4 +1,5 @@
 #include "main_window.h"
+#include <QDebug>
 
 MainWindow::MainWindow(QWidget * parent) :
     QWidget(parent) {
@@ -171,8 +172,7 @@ void MainWindow::SlotOpenFile() {
         gInputFile->setText(filePath);
         gDataTable->clearContents();
 
-        /* Linux */
-        /*
+#ifdef __linux__
         using namespace libxl;
         Book * book = xlCreateXMLBook();
         // Book * book = xlCreateBook();  // xlCreateBook() for xls
@@ -196,7 +196,22 @@ void MainWindow::SlotOpenFile() {
                 gUpdateButton->setEnabled(true);
             }
         }
-        */
+#elif _WIN32
+        QXlsx::Document xlsx(filePath);
+        gDataTable->setRowCount(xlsx.dimension().lastRow() - 1);
+        for (int i = 2; i <= xlsx.dimension().lastRow(); ++i) {
+            for (int j = 1; j <= xlsx.dimension().lastColumn(); ++j) {
+                if (QXlsx::Cell * cell = xlsx.cellAt(i, j)) {
+                    QTableWidgetItem * item = new QTableWidgetItem(cell->value().toString());
+                    item->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+                    gDataTable->setItem(i - 2, j - 1, item);
+                }
+            }
+        }
+        Plot();
+        gEditButton->setEnabled(true);
+        gUpdateButton->setEnabled(true);
+#endif
     }
 }
 
@@ -213,8 +228,7 @@ void MainWindow::SlotEditTable() {
 }
 
 void MainWindow::SlotUpdateTable() {
-    /* Linux */
-    /*
+#ifdef __linux__
     using namespace libxl;
     Book * book = xlCreateXMLBook();
     // Book * book = xlCreateBook();  // xlCreateBook() for xls
@@ -229,14 +243,22 @@ void MainWindow::SlotUpdateTable() {
                     }
                 }
             }
-            book->save((gInputFile->text().toStdString()).c_str());  // NND，需要破解
+            book->save((gInputFile->text().toStdString()).c_str());
             book->release();
         }
     }
-    */
+#elif _WIN32
+    QXlsx::Document xlsx(gInputFile->text());
+    for (int i = 0; i < gDataTable->rowCount(); ++i) {
+        for (int j = 0; j < gDataTable->columnCount(); ++j) {
+            xlsx.write(i + 2, j + 1, QVariant(gDataTable->item(i, j)->text().toDouble()));
+        }
+    }
+    xlsx.save();
 
     MyMessageBox msgBox;
     msgBox.setText(tr("更新表格完毕！"));
     msgBox.setStandardButtons(QMessageBox::Save);
     msgBox.exec();
+#endif
 }

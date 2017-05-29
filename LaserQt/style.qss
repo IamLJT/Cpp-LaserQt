@@ -10,6 +10,7 @@ QTextEdit {
     border: 1px solid #000000;
     border-radius: 2px;
     padding: 0 0 0 5px;
+    font-size: 12px;
 }
 
 QPushButton {
@@ -23,11 +24,6 @@ QLabel, QMessageBox {
     font-family: STKaiti;
     font-size: 14px;
     color: #000000;
-}
-
-QTextEdit {
-    font-size: 12px;
-    padding: 0 0 0 20px;
 }
 
 QProgressBar {

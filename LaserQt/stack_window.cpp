@@ -108,6 +108,18 @@ void StackWindow::SlotQuit() {
     msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
     msgBox.setDefaultButton(QMessageBox::Yes);
     if (msgBox.exec() == QMessageBox::Yes) {
-        QCoreApplication::exit();  // TODO
+        QCoreApplication::instance()->exit(0);  // TODO
+    }
+}
+
+void StackWindow::closeEvent(QCloseEvent * event) {
+    MyMessageBox msgBox;
+    msgBox.setText(tr("您要退出系统吗?"));
+    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    msgBox.setDefaultButton(QMessageBox::Yes);
+    if (msgBox.exec() == QMessageBox::Yes) {
+        event->accept();
+    } else {
+        event->ignore();
     }
 }

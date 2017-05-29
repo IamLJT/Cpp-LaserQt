@@ -160,8 +160,7 @@ void SecondWindow::SetWidgets() {
 }
 
 void SecondWindow::InitTaskQueue() {
-    /* Linux */
-    /*
+#ifdef __linux__
     using namespace libxl;
     Book * book = xlCreateXMLBook();
     // Book * book = xlCreateBook();  // xlCreateBook() for xls
@@ -186,10 +185,23 @@ void SecondWindow::InitTaskQueue() {
             gStartProcessingButton->setEnabled(true);
         }
     }
-    */
-
-    /* Windows */
-
+#elif _WIN32
+    QXlsx::Document xlsx(gInputFile->text());
+    for (int i = 2; i <= xlsx.dimension().lastRow(); ++i) {
+        QVector<double> dataCell;
+        dataCell.push_back(double(i - 1));
+        for (int j = 1; j <= xlsx.dimension().lastColumn(); ++j) {
+            if (QXlsx::Cell * cell = xlsx.cellAt(i, j)) {
+                dataCell.push_back(cell->value().toDouble());
+            }
+            gTaskQueue->enqueue(dataCell);
+            gTaskList->push_back(dataCell);
+        }
+    }
+    gLogger->append(tr("[+] 初始化任务队列完毕."));
+    gLogger->append(tr("[+] 新加入")+QString::number(xlsx.dimension().lastRow() - 1)+tr("项任务."));
+    gStartProcessingButton->setEnabled(true);
+#endif
 }
 
 void SecondWindow::Sleep(size_t msec) {

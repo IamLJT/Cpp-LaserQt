@@ -28,6 +28,7 @@ private:
 
     void CreateMainWindow();
     void SetWidgets();
+    void closeEvent(QCloseEvent * event);
 
 private slots:
     void SlotPrev();
