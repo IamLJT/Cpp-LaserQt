@@ -49,8 +49,6 @@ FORMS    +=
 RESOURCES += \
     laserqt.qrc
 
-CONFIG += axcontainer
-
 QMAKE_CXXFLAGS += -fopenmp
 LIBS += -fopenmp
 

@@ -16,8 +16,8 @@ StackWindow::~StackWindow() {
 }
 
 void StackWindow::CreateMainWindow() {
-    setMinimumSize(1280, 680);
-    setMaximumSize(1280, 680);
+    setMinimumSize(1280, 700);
+    setMaximumSize(1280, 700);
 
     SetWidgets();
 }

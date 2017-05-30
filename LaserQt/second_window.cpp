@@ -159,6 +159,9 @@ void SecondWindow::SetWidgets() {
     setLayout(layout);
 }
 
+/*
+ * 初始化任务队列，每项任务格式 [路径编号，起点X坐标，起点Y坐标，终点X坐标，终点Y坐标，下压量，热参数，正反标志]
+*/
 void SecondWindow::InitTaskQueue() {
 #ifdef __linux__
     using namespace libxl;
@@ -204,16 +207,21 @@ void SecondWindow::InitTaskQueue() {
 #endif
 }
 
+/*
+ * 休眠函数
+*/
 void SecondWindow::Sleep(size_t msec) {
     QTime dieTime = QTime::currentTime().addMSecs(msec);
-    while (QTime::currentTime() < dieTime)
-    QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+    while (QTime::currentTime() < dieTime) QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
 }
 
+/*
+ * 初始化Socket通信
+*/
 void SecondWindow::InitSocket() {
     gUDPSocket = new QUdpSocket;
-    hostAddress.setAddress(gProcessMachineIP);
-    gUDPSocket->bind(hostAddress, gProcessMachinePort);
+    gHostAddress.setAddress(gProcessMachineIP);
+    gUDPSocket->bind(gHostAddress, gProcessMachinePort);  // IP和端口从xml/config.xml文件中获取
     connect(gUDPSocket, SIGNAL(readyRead()), this, SLOT(SlotReadPendingDatagrams()));
 }
 
@@ -221,10 +229,13 @@ void SecondWindow::SlotOpenFile() {
     QString filePath = QFileDialog::getOpenFileName(this, tr("选择文件"), QString::fromStdString(GetWorkDirectory()), tr("Excel File(*.xlsx)"));
     if (filePath != "") {
         gInputFile->setText(filePath);
-        InitTaskQueue();
+        InitTaskQueue();  // 读取数据文件后即初始化任务队列
     }
 }
 
+/*
+ * 开始加工
+ */
 void SecondWindow::SlotStartProcessing() {
     gStopProcessingButton->setEnabled(true);
 
@@ -245,14 +256,14 @@ void SecondWindow::SlotStartProcessing() {
     }
 
     QString processMachine = gProcessMachineIP + ":" + QString::number(gProcessMachinePort);
-    InitSocket();  // 初始化Socket
+    InitSocket();  // 初始化Socket通信
 
     MyMessageBox msgBox;
     msgBox.setText(tr("主工控机: <") + processMachine + ">");
     msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Cancel);
     msgBox.setDefaultButton(QMessageBox::Save);
     if (msgBox.exec() == QMessageBox::Save) {
-        while (!gTaskQueue->empty()) {
+        while (!gTaskQueue->empty()) {  // 发送任务队列里中所有任务到主工控机
             QVector<double> dataCell = gTaskQueue->dequeue();
             QVariantList array;
             array << int(dataCell.at(0)) << dataCell.at(1) << dataCell.at(2) << dataCell.at(3);
@@ -262,27 +273,53 @@ void SecondWindow::SlotStartProcessing() {
             bool ok;
             QByteArray json = serializer.serialize(array, &ok);
             if (ok) {
-                // gUDPSocket->writeDatagram(json.data(), json.size(), hostAddress, gProcessMachinePort);  // 发送数据包
+                gUDPSocket->writeDatagram(json.data(), json.size(), gHostAddress, gProcessMachinePort);  // 发送数据包
             }
 
-            Sleep(10);  // TODO
+            Sleep(10);  // 设置适当的延时
         }
-        gTimer->start(1000);  // the UpdateTime() slot is called every second.
+        gTimer->start(1000);  // 开始加工计时
     }
 }
 
+/*
+ * 停止加工
+ */
 void SecondWindow::SlotStopProcessing() {
     gContinueProcessingButton->setEnabled(true);
+
+    QVariantList array;
+    array << 1000;  // 规定停止加工标志位1000
+    QJson::Serializer serializer;
+    bool ok;
+    QByteArray json = serializer.serialize(array, &ok);
+    if (ok) {
+        gUDPSocket->writeDatagram(json.data(), json.size(), gHostAddress, gProcessMachinePort);  // 发送数据包
+    }
+
     gIsStop = true;
 }
 
+/*
+ * 继续加工
+ */
 void SecondWindow::SlotContinueProcessing() {
+    QVariantList array;
+    array << 1001;  // 规定继续加工标志位1001
+    QJson::Serializer serializer;
+    bool ok;
+    QByteArray json = serializer.serialize(array, &ok);
+    if (ok) {
+        gUDPSocket->writeDatagram(json.data(), json.size(), gHostAddress, gProcessMachinePort);  // 发送数据包
+    }
+
     gIsStop = false;
 }
 
+/*
+ * 更新加工时间
+ */
 void SecondWindow::SlotUpdateTime() {
-    // QDateTime time = QDateTime::currentDateTime();
-    // gProcessingTime->setText(time.toString("hh:mm:ss"));
     gCounter++;
     int h = gCounter / 3600;
     int m = (gCounter % 3600) / 60;
@@ -310,6 +347,9 @@ void SecondWindow::SlotUpdateTime() {
     gProcessingTime->setText(h_str + ":" + m_str + ":" + s_str);
 }
 
+/*
+ * 处理接收的数据包，数据包格式 [实时X坐标，实时Y坐标，路径编号，正反标志]
+ */
 void SecondWindow::SlotReadPendingDatagrams() {
     static int pathIndex_ = 0;
     while (gUDPSocket->hasPendingDatagrams()) {
@@ -317,7 +357,7 @@ void SecondWindow::SlotReadPendingDatagrams() {
         datagram.resize(gUDPSocket->pendingDatagramSize());
         QHostAddress sender;
         quint16 senderPort;
-        gUDPSocket->readDatagram(datagram.data(), datagram.size(), &sender, &senderPort);  // TODO
+        gUDPSocket->readDatagram(datagram.data(), datagram.size(), &sender, &senderPort);  // 接收数据包
 
         QJson::Parser parser;
         bool ok;
@@ -326,9 +366,9 @@ void SecondWindow::SlotReadPendingDatagrams() {
         double y = data[1].toDouble();
         int pathIndex = data[2].toInt();
         // int flag = data[3].toInt();
-        if (pathIndex == gTaskList->size() + 1) {
+        if (pathIndex == gTaskList->size() + 1) {  // 加工完毕时，主工控机发送 [xxx，xxx，最大路径编号 + 1，xxx] 通知工艺规划计算机
             gLogger->append(tr("[+] 第") + QString::number(pathIndex - 1) + ("项任务处理完毕."));
-            gTimer->stop();
+            gTimer->stop();  // 停止加工计时
         }
         else {
             if (pathIndex != pathIndex_) {
@@ -346,7 +386,7 @@ void SecondWindow::SlotReadPendingDatagrams() {
                 gReduction->setText(QString::number(dataCell.at(5)));
                 gThermalParameter->setText(QString::number(dataCell.at(6)));
             }
-            gCustomPlot->graph(0)->addData(x, y);
+            gCustomPlot->graph(0)->addData(x, y);  // 实时绘图
             gCustomPlot->graph(0)->rescaleAxes();
             gCustomPlot->replot();
         }

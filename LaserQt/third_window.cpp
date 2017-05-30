@@ -36,7 +36,7 @@ void ThirdWindow::SetWidgets() {
     connect(browseObjectDataFileButton, SIGNAL(clicked()), this, SLOT(SlotOpenObjectDataFile()));
     leftTopLayout->addWidget(browseObjectDataFileButton, 0, 2);
 
-    leftTopLayout->addWidget(new QLabel(tr("扫描编号")), 1, 0);
+    leftTopLayout->addWidget(new QLabel(tr("扫描数据")), 1, 0);
     gScanningDataFile = new QLineEdit;
     leftTopLayout->addWidget(gScanningDataFile, 1, 1);
     QPushButton * browseScanningDataFileButton = new QPushButton(tr("浏览"));
@@ -145,8 +145,33 @@ void ThirdWindow::SlotOpenScanningDataFile() {
     QString filePath = QFileDialog::getOpenFileName(this, tr("选择文件"), QString::fromStdString(GetWorkDirectory()), tr("Text File(*.txt)"));
     if (filePath != "") {
         gScanningDataFile->setText(filePath);
-        gPointCloudDataScanningButton->setEnabled(true);\
+        gPointCloudDataScanningButton->setEnabled(true);
         gPointCloudDataFittingButton->setEnabled(true);
+
+        QProcess * proc = new QProcess;
+        proc->setCreateProcessArgumentsModifier([] (QProcess::CreateProcessArguments * args) {
+            args->startupInfo->wShowWindow |= SW_SHOW;
+            args->startupInfo->dwFlags |= STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
+        });
+
+        proc->start("D:\\Cpp-LaserQt\\cmake-gui.exe", QStringList() << "");
+        if (proc->waitForStarted()) {
+            proc->waitForFinished();
+            MyMessageBox msgBox;
+            msgBox.setText(tr("点云扫描完毕!"));
+            msgBox.setStandardButtons(QMessageBox::Save);
+            if (QProcess::NormalExit == proc->exitCode()) {
+                MyMessageBox msgBox;
+                msgBox.setText(tr("点云扫描完毕!"));
+                msgBox.setStandardButtons(QMessageBox::Save);
+            }
+        } else {
+            MyMessageBox msgBox;
+            msgBox.setText(tr("调用外部程序失败!"));
+            msgBox.setStandardButtons(QMessageBox::Save);
+        }
+        delete proc;
+        proc = NULL;
     }
 }
 

@@ -163,6 +163,7 @@ void MainWindow::Plot() {
     gCustomPlot->yAxis->setRange(floor(y_min), ceil(y_max));  // TODO
     gCustomPlot->graph(0)->setName(tr("正面加工路径(红线)\n反面加工路径(黑线)"));  // TODO
     gCustomPlot->legend->setVisible(true);
+    gCustomPlot->legend->setFont(QFont(font().family(), 10, QFont::Bold));
     gCustomPlot->replot();
 }
 

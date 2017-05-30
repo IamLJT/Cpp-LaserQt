@@ -19,6 +19,6 @@ string GetWorkDirectory() {
 }
 
 pair<int, int> GetScreenSize() {
-    pair<int, int> p = make_pair(1280, 620);
+    pair<int, int> p = make_pair(1280, 640);
     return p;
 }

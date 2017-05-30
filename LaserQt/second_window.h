@@ -55,7 +55,7 @@ private:
     bool gIsStop;
     QString gProcessMachineIP;
     int16_t gProcessMachinePort;
-    QHostAddress hostAddress;
+    QHostAddress gHostAddress;
     QUdpSocket * gUDPSocket;
     bool recvDone;
 
