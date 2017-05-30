@@ -148,6 +148,7 @@ void ThirdWindow::SlotOpenScanningDataFile() {
         gPointCloudDataScanningButton->setEnabled(true);
         gPointCloudDataFittingButton->setEnabled(true);
 
+#ifdef _WIN32
         QProcess * proc = new QProcess;
         proc->setCreateProcessArgumentsModifier([] (QProcess::CreateProcessArguments * args) {
             args->startupInfo->wShowWindow |= SW_SHOW;
@@ -172,6 +173,7 @@ void ThirdWindow::SlotOpenScanningDataFile() {
         }
         delete proc;
         proc = NULL;
+#endif
     }
 }
 

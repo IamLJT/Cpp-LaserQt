@@ -177,7 +177,7 @@ void MainWindow::SlotOpenFile() {
         using namespace libxl;
         Book * book = xlCreateXMLBook();
         // Book * book = xlCreateBook();  // xlCreateBook() for xls
-        book->setKey(L"Michael Hillier", L"windows-222329040ec5ec046fb46767a7h1gej6");
+        book->setKey("Michael Hillier", "windows-222329040ec5ec046fb46767a7h1gej6");
         if (book) {
             if (book->load(filePath.toStdString().c_str())) {
                 Sheet * sheet = book->getSheet(0);
@@ -233,7 +233,7 @@ void MainWindow::SlotUpdateTable() {
     using namespace libxl;
     Book * book = xlCreateXMLBook();
     // Book * book = xlCreateBook();  // xlCreateBook() for xls
-    book->setKey(L"Michael Hillier", L"windows-222329040ec5ec046fb46767a7h1gej6");
+    book->setKey("Michael Hillier", "windows-222329040ec5ec046fb46767a7h1gej6");
     if (book) {
         if (book->load(gInputFile->text().toStdString().c_str())) {
             Sheet * sheet = book->getSheet(0);

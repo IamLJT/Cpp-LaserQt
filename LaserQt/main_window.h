@@ -11,13 +11,12 @@
 #include <QTableWidget>
 #include <QTableWidgetItem>
 #include <QVBoxLayout>
-#include <QtXlsx>
 #include "auxiliary_function.h"
 #include "my_messagebox.h"
 #include "qcustomplot.h"
 
 #ifdef _WIN32
-  #include <windows.h>
+  #include <QtXlsx>
 #elif __linux__
   #include "libxl.h"
 #endif
