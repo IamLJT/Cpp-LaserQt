@@ -24,6 +24,7 @@ public:
     explicit ThirdWindow(QWidget *parent = 0);
     ~ThirdWindow();
     QString CopyObjectDataFilePath();
+    void clear();
 
 private:
     QLineEdit * gObjectDataFile;
@@ -35,9 +36,12 @@ private:
     QPushButton * gPointCloudDataDenoisingButton;
     QPushButton * gPointCloudDataFittingButton;
     QtDataVisualization::Q3DScatter * gPointCloudDataGraph;
+    QtDataVisualization::QScatter3DSeries * series1;
+    QtDataVisualization::QScatter3DSeries * series2;
 
     void CreateMainWindow();
     void SetWidgets();
+    void ClearGraph();
 
 private slots:
     void SlotOpenObjectDataFile();

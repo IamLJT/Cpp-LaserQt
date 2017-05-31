@@ -39,6 +39,8 @@ void SecondWindow::clear() {
     gStartProcessingButton->setEnabled(false);
     gStopProcessingButton->setEnabled(false);
     gContinueProcessingButton->setEnabled(false);
+
+    ClearGraph();
 }
 
 void SecondWindow::CreateMainWindow() {
@@ -223,6 +225,13 @@ void SecondWindow::InitSocket() {
     gHostAddress.setAddress(gProcessMachineIP);
     gUDPSocket->bind(gHostAddress, gProcessMachinePort);  // IP和端口从xml/config.xml文件中获取
     connect(gUDPSocket, SIGNAL(readyRead()), this, SLOT(SlotReadPendingDatagrams()));
+}
+
+void SecondWindow::ClearGraph() {
+    gCustomPlot->clearGraphs();
+    gCustomPlot->xAxis->setTickLabels(false);
+    gCustomPlot->yAxis->setTickLabels(false);
+    gCustomPlot->replot();
 }
 
 void SecondWindow::SlotOpenFile() {

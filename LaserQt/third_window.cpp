@@ -15,6 +15,21 @@ ThirdWindow::~ThirdWindow() {
     delete gPointCloudDataDenoisingButton;
     delete gPointCloudDataFittingButton;
     delete gPointCloudDataGraph;
+    delete series1;
+    delete series2;
+}
+
+void ThirdWindow::clear() {
+    gObjectDataFile->clear();
+    gScanningDataFile->clear();
+    gLogger->clear();
+    gExecuteProgressBar->setValue(0);
+    gCameraPresentList->setCurrentIndex(9);
+    gPointCloudDataScanningButton->setEnabled(false);
+    gPointCloudDataDenoisingButton->setEnabled(false);
+    gPointCloudDataFittingButton->setEnabled(false);
+
+    ClearGraph();
 }
 
 void ThirdWindow::CreateMainWindow() {
@@ -47,6 +62,7 @@ void ThirdWindow::SetWidgets() {
     gLogger = new QTextEdit;
     // gLogger->setEnabled(false);
     gExecuteProgressBar = new QProgressBar;
+    gExecuteProgressBar->setValue(0);
 
     /* left-middle layout */
     gCameraPresentList = new QComboBox;
@@ -114,6 +130,8 @@ void ThirdWindow::SetWidgets() {
     gPointCloudDataGraph->axisX()->setTitle("X");
     gPointCloudDataGraph->axisX()->setTitle("Y");
     gPointCloudDataGraph->axisX()->setTitle("Z");
+    series1 = new QtDataVisualization::QScatter3DSeries;
+    series2 = new QtDataVisualization::QScatter3DSeries;
 
     QWidget * container = QWidget::createWindowContainer(gPointCloudDataGraph);  // It is important!
 
@@ -132,6 +150,12 @@ void ThirdWindow::SetWidgets() {
 
 QString ThirdWindow::CopyObjectDataFilePath() {
     return gObjectDataFile->text();
+}
+
+void ThirdWindow::ClearGraph() {
+    gPointCloudDataGraph->removeSeries(series1);  // TODO
+    gPointCloudDataGraph->removeSeries(series2);
+    gPointCloudDataGraph->scene()->activeCamera()->setCameraPreset(QtDataVisualization::Q3DCamera::CameraPresetIsometricRight);
 }
 
 void ThirdWindow::SlotOpenObjectDataFile() {
@@ -193,7 +217,6 @@ void ThirdWindow::SlotDenoisePointCloudData() {
 }
 
 void ThirdWindow::SlotFitPointCloudData() {
-    QtDataVisualization::QScatter3DSeries * series1 = new QtDataVisualization::QScatter3DSeries;
     series1->setMeshSmooth(QtDataVisualization::QAbstract3DSeries::MeshPoint);
     QtDataVisualization::QScatterDataArray data1;
     QFile f1(gObjectDataFile->text());
@@ -210,7 +233,6 @@ void ThirdWindow::SlotFitPointCloudData() {
     }
     series1->dataProxy()->addItems(data1);
 
-    QtDataVisualization::QScatter3DSeries * series2 = new QtDataVisualization::QScatter3DSeries;
     series2->setMeshSmooth(QtDataVisualization::QAbstract3DSeries::MeshSphere);
     QtDataVisualization::QScatterDataArray data2;
     QFile f2(gScanningDataFile->text());

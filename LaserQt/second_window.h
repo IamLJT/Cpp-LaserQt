@@ -63,6 +63,7 @@ private:
     void InitTaskQueue();
     void Sleep(size_t msec);
     void InitSocket();
+    void ClearGraph();
 
 private slots:
     void SlotOpenFile();

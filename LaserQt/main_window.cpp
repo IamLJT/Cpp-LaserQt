@@ -18,11 +18,7 @@ void MainWindow::clear() {
     gDataTable->clearContents();
     gEditButton->setEnabled(false);
     gUpdateButton->setEnabled(false);
-    gCustomPlot->clearItems();
-    gCustomPlot->xAxis->setTickLabels(false);
-    gCustomPlot->yAxis->setTickLabels(false);
-    gCustomPlot->legend->setVisible(false);
-    gCustomPlot->replot();
+    ClearGraph();
 }
 
 void MainWindow::CreateMainWindow() {
@@ -106,7 +102,17 @@ void MainWindow::SetWidgets() {
     setLayout(layout);
 }
 
+void MainWindow::ClearGraph() {
+    gCustomPlot->clearItems();
+    gCustomPlot->xAxis->setTickLabels(false);
+    gCustomPlot->yAxis->setTickLabels(false);
+    gCustomPlot->legend->setVisible(false);
+    gCustomPlot->replot();
+}
+
 void MainWindow::Plot() {
+    ClearGraph();
+
     double x_start, y_start, x_end, y_end, flag;
     double x_max = gDataTable->item(0, 0)->text().toDouble(), y_max = gDataTable->item(0, 1)->text().toDouble();
     double x_min = gDataTable->item(0, 0)->text().toDouble(), y_min = gDataTable->item(0, 1)->text().toDouble();
@@ -255,6 +261,7 @@ void MainWindow::SlotUpdateTable() {
         }
     }
     xlsx.save();
+    Plot();
 
     MyMessageBox msgBox;
     msgBox.setText(tr("更新表格完毕！"));

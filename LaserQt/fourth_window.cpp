@@ -36,6 +36,10 @@ FourthWindow::~FourthWindow() {
     }
 }
 
+void FourthWindow::clear() {
+    ClearGraph();
+}
+
 void FourthWindow::CreateMainWindow() {
     setMinimumSize(GetScreenSize().first, GetScreenSize().second);
     setMaximumSize(GetScreenSize().first, GetScreenSize().second);
@@ -175,6 +179,8 @@ void FourthWindow::SetWidgets() {
 
     setLayout(layout);
 }
+
+void FourthWindow::ClearGraph() {}
 
 void FourthWindow::CopyObjectDataFilePath(QString path) {
     gObjectDataFile = path;
@@ -317,6 +323,8 @@ void FourthWindow::Generate2DMatrixAccordingToX() {
     gErrorCanvas_00->xAxis->setRange(1, i);
     gErrorCanvas_00->yAxis->setRange(0, 0.1);
     gErrorCanvas_00->replot();
+
+    gErrorCanvas_00->saveJpg(tr("D:/我的文档/Qt/水平方向局部误差图.jpg"), 488, 485, 1, -1);  // TODO
 }
 
 void FourthWindow::Generate2DMatrixAccordingToY() {}

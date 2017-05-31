@@ -39,6 +39,7 @@ private:
 
     void CreateMainWindow();
     void SetWidgets();
+    void ClearGraph();
     void Plot();
 
 private slots:

@@ -10,6 +10,7 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QStackedWidget>
+#include <QtPrintSupport>
 #include <QVBoxLayout>
 #include "auxiliary_function.h"
 #include "custom_qlabel.h"
@@ -35,6 +36,7 @@ public:
     ~FourthWindow();
     void CopyObjectDataFilePath(QString path);
     void InitWindow();
+    void clear();
 
 private:
     QCustomPlot * gErrorCanvas_00;
@@ -63,6 +65,7 @@ private:
     void Generate2DMatrixAccordingToX();
     void Generate2DMatrixAccordingToY();
     void PlotHeatMap();
+    void ClearGraph();
 
 private slots:
     void SlotLeftArrowClicked();
