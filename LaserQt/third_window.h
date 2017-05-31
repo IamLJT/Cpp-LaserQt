@@ -9,6 +9,7 @@
 #include <QProgressBar>
 #include <QPushButton>
 #include <QTextEdit>
+#include <QtXml>
 #include <QVBoxLayout>
 #include "auxiliary_function.h"
 #include "my_messagebox.h"

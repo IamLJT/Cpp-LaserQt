@@ -147,38 +147,45 @@ void ThirdWindow::SlotOpenScanningDataFile() {
         gScanningDataFile->setText(filePath);
         gPointCloudDataScanningButton->setEnabled(true);
         gPointCloudDataFittingButton->setEnabled(true);
-
-#ifdef _WIN32
-        QProcess * proc = new QProcess;
-        proc->setCreateProcessArgumentsModifier([] (QProcess::CreateProcessArguments * args) {
-            args->startupInfo->wShowWindow |= SW_SHOW;
-            args->startupInfo->dwFlags |= STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
-        });
-
-        proc->start("D:\\Cpp-LaserQt\\cmake-gui.exe", QStringList() << "");
-        if (proc->waitForStarted()) {
-            proc->waitForFinished();
-            MyMessageBox msgBox;
-            msgBox.setText(tr("点云扫描完毕!"));
-            msgBox.setStandardButtons(QMessageBox::Save);
-            if (QProcess::NormalExit == proc->exitCode()) {
-                MyMessageBox msgBox;
-                msgBox.setText(tr("点云扫描完毕!"));
-                msgBox.setStandardButtons(QMessageBox::Save);
-            }
-        } else {
-            MyMessageBox msgBox;
-            msgBox.setText(tr("调用外部程序失败!"));
-            msgBox.setStandardButtons(QMessageBox::Save);
-        }
-        delete proc;
-        proc = NULL;
-#endif
     }
 }
 
 void ThirdWindow::SlotScanPointCloudData() {
     gPointCloudDataDenoisingButton->setEnabled(true);
+#ifdef _WIN32
+    QString FAROSDKDemoApp;
+    QString FAROOpenDemoApp;
+
+    QFile fd(":/xml/xml/faro.xml");
+    if (fd.open(QFile::ReadOnly | QFile::Text)) {
+        QXmlStreamReader * reader = new QXmlStreamReader(&fd);
+        while (!reader->atEnd()) {
+            reader->readNext();
+            if (reader->name() == "FAROSDKDemoApp") {
+                FAROSDKDemoApp = reader->readElementText();
+            }
+            else if (reader->name() == "FAROOpenDemoApp") {
+                FAROOpenDemoApp = reader->readElementText().toUShort();
+            }
+        }
+        delete reader;
+        fd.close();
+    }
+
+    QProcess * proc = new QProcess;
+    proc->execute(FAROSDKDemoApp, QStringList() << FAROSDKDemoApp);
+    if (QProcess::NormalExit == proc->exitCode()) {
+        proc->execute(FAROOpenDemoApp, QStringList() << FAROOpenDemoApp);
+        if (QProcess::NormalExit == proc->exitCode()) {
+            MyMessageBox msgBox;
+            msgBox.setText(tr("点云扫描完毕!"));
+            msgBox.setStandardButtons(QMessageBox::Save);
+            msgBox.exec();
+        }
+    }
+    delete proc;
+    proc = NULL;
+#endif
 }
 
 void ThirdWindow::SlotDenoisePointCloudData() {
