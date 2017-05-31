@@ -28,7 +28,7 @@ FourthWindow::~FourthWindow() {
     delete gYEnd;
     delete gOKButton;
     delete gXDivide;
-    delete gXDivide;
+    delete gYDivide;
     delete gPointCloudDataGraph;
 
     for (size_t i = 0; i < gEstimators.size(); ++i) {

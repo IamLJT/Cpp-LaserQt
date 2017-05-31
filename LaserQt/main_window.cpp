@@ -1,5 +1,4 @@
 #include "main_window.h"
-#include <QDebug>
 
 MainWindow::MainWindow(QWidget * parent) :
     QWidget(parent) {

@@ -1,5 +1,4 @@
 #include "second_window.h"
-#include "QDebug"
 
 SecondWindow::SecondWindow(QWidget *parent) :
     QWidget(parent) {
@@ -19,6 +18,7 @@ SecondWindow::~SecondWindow() {
     delete gContinueProcessingButton;
     delete gCustomPlot;
     delete gLogger;
+
     delete gTaskQueue;
     delete gTaskList;
     delete gTimer;

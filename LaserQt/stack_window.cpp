@@ -37,12 +37,15 @@ void StackWindow::SetWidgets() {
     gStackWin->setCurrentIndex(gStackWinIndex);
 
     /* button layout */
-    gPrevButton = new QPushButton(tr("上一步"));
+    gPrevButton = new QPushButton;
+    gPrevButton->setText( tr("上一步"));
     connect(gPrevButton, SIGNAL(clicked()), this, SLOT(SlotPrev()));
     gPrevButton->setEnabled(false);
-    gNextButton = new QPushButton(tr("下一步"));
+    gNextButton = new QPushButton;
+    gNextButton->setText(tr("下一步"));
     connect(gNextButton, SIGNAL(clicked()), this, SLOT(SlotNext()));
-    QPushButton * quitButton = new QPushButton(tr("退出"));
+    QPushButton * quitButton = new QPushButton;
+    quitButton->setText(tr("退出"));
     connect(quitButton, SIGNAL(clicked()), this, SLOT(SlotQuit()));
 
     QHBoxLayout * bottomLayout = new QHBoxLayout;
@@ -108,6 +111,10 @@ void StackWindow::SlotQuit() {
     msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
     msgBox.setDefaultButton(QMessageBox::Yes);
     if (msgBox.exec() == QMessageBox::Yes) {
+        gMainWin->close();
+        gSecondWin->close();
+        gThirdWin->close();
+        gFourthWin->close();
         QCoreApplication::exit(0);  // TODO
     }
 }
