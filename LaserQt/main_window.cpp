@@ -80,6 +80,9 @@ void MainWindow::SetWidgets() {
     /* right layout */
     gCustomPlot = new QCustomPlot;
     gCustomPlot->addGraph();
+    gCustomPlot->graph(0)->setPen(QPen(Qt::red));
+    gCustomPlot->addGraph();
+    gCustomPlot->graph(1)->setPen(QPen(Qt::black));
     gCustomPlot->plotLayout()->insertRow(0);
     gCustomPlot->plotLayout()->addElement(0, 0, new QCPTextElement(gCustomPlot, tr("加工路径静态图"), QFont(font().family(), 12, QFont::Bold)));
     gCustomPlot->xAxis->setLabel(tr("X-板长方向(m)"));
@@ -88,6 +91,10 @@ void MainWindow::SetWidgets() {
     gCustomPlot->yAxis->setLabel(tr("Y-板宽方向(m)"));
     gCustomPlot->yAxis->setVisible(true);
     gCustomPlot->yAxis->setTickLabels(false);
+    gCustomPlot->xAxis2->setVisible(true);
+    gCustomPlot->xAxis2->setTickLabels(false);
+    gCustomPlot->yAxis2->setVisible(true);
+    gCustomPlot->yAxis2->setTickLabels(false);
 
     QVBoxLayout * rightLayout = new QVBoxLayout;
     rightLayout->addWidget(gCustomPlot);
@@ -166,7 +173,8 @@ void MainWindow::Plot() {
     gCustomPlot->xAxis->setRange(floor(x_min), ceil(x_max));  // TODO
     gCustomPlot->yAxis->setTickLabels(true);
     gCustomPlot->yAxis->setRange(floor(y_min), ceil(y_max));  // TODO
-    gCustomPlot->graph(0)->setName(tr("正面加工路径(红线)\n反面加工路径(黑线)"));  // TODO
+    gCustomPlot->graph(0)->setName(tr("正面加工路径(红线)"));
+    gCustomPlot->graph(1)->setName(tr("反面加工路径(黑线)"));
     gCustomPlot->legend->setVisible(true);
     gCustomPlot->legend->setFont(QFont(font().family(), 10, QFont::Bold));
     gCustomPlot->replot();
