@@ -331,8 +331,6 @@ void FourthWindow::Generate2DMatrixAccordingToX() {
     gErrorCanvas_00->xAxis->setRange(1, i);
     gErrorCanvas_00->yAxis->setRange(0, 0.1);
     gErrorCanvas_00->replot();
-
-    // gErrorCanvas_00->saveJpg(tr("D:/我的文档/Qt/水平方向局部误差图.jpg"), 488, 485, 1, -1);  // TODO
 }
 
 void FourthWindow::Generate2DMatrixAccordingToY() {
@@ -373,8 +371,6 @@ void FourthWindow::Generate2DMatrixAccordingToY() {
     gErrorCanvas_01->xAxis->setRange(1, i);
     gErrorCanvas_01->yAxis->setRange(0, 0.1);
     gErrorCanvas_01->replot();
-
-    // gErrorCanvas_01->saveJpg(tr("D:/我的文档/Qt/垂直方向局部误差图.jpg"), 488, 485, 1, -1);  // TODO
 }
 
 void FourthWindow::PlotX(qint32 split) {
@@ -421,7 +417,7 @@ void FourthWindow::PlotX(qint32 split) {
         errorCanvas.at(i)->yAxis->setRange(0, 0.1);
         errorCanvas.at(i)->replot();
 
-        errorCanvas.at(i)->saveJpg("D:/我的文档/Qt/水平方向" + QString::number(i + 1) + "_" + QString::number(split) + "处误差图.jpg", 488, 485, 1, -1);  // TODO
+        errorCanvas.at(i)->saveJpg("D:/水平方向" + QString::number(i + 1) + "_" + QString::number(split) + "处误差图.jpg", 488, 485, 1, -1);  // TODO
     }
 
     for (size_t i = 0; i < errorCanvas.size(); ++i) {
@@ -473,7 +469,7 @@ void FourthWindow::PlotY(qint32 split) {
         errorCanvas.at(i)->yAxis->setRange(0, 0.1);
         errorCanvas.at(i)->replot();
 
-        errorCanvas.at(i)->saveJpg("D:/我的文档/Qt/垂直方向" + QString::number(i + 1) + "_" + QString::number(split) + "处误差图.jpg", 488, 485, 1, -1);  // TODO
+        errorCanvas.at(i)->saveJpg("D:/垂直方向" + QString::number(i + 1) + "_" + QString::number(split) + "处误差图.jpg", 488, 485, 1, -1);  // TODO
     }
 
     for (size_t i = 0; i < errorCanvas.size(); ++i) {
@@ -543,5 +539,9 @@ void FourthWindow::SlotEstimate() {
     if (gXDivide->text() != "" && gYDivide->text() != "") {
         PlotX(gXDivide->text().toUInt());
         PlotY(gYDivide->text().toUInt());
+        MyMessageBox msgBox;
+        msgBox.setText(tr("误差评估图生成完毕!"));
+        msgBox.setStandardButtons(QMessageBox::Save);
+        msgBox.exec();
     }
 }
