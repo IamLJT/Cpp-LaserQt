@@ -95,11 +95,9 @@ win32 {
     LIBS += -L$$PWD/lib/kdtree -lkdtree
 }
 
-# KDTree setting
+# Boost setting
 win32 {
-    INCLUDEPATH += include_cpp/kdtree
-    LIBS += -L$$PWD/winlib/kdtree -lkdtree
+    INCLUDEPATH += C:\Boost\include\boost-1_62\boost
 } else {
-    INCLUDEPATH += include_cpp/kdtree
-    LIBS += -L$$PWD/lib/kdtree -lkdtree
+
 }

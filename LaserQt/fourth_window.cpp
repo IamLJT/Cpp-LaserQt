@@ -1,5 +1,6 @@
 #include "fourth_window.h"
 #include <algorithm>
+#include <QDebug>
 
 bool CompareX(struct estimator * a, struct estimator * b) {
     return a->x < b->x;
@@ -376,6 +377,111 @@ void FourthWindow::Generate2DMatrixAccordingToY() {
     // gErrorCanvas_01->saveJpg(tr("D:/我的文档/Qt/垂直方向局部误差图.jpg"), 488, 485, 1, -1);  // TODO
 }
 
+void FourthWindow::PlotX(qint32 split) {
+    vector<double> x;
+    double cur_x = gEstimatorsAccordingToX.at(0)->x;
+    x.push_back(cur_x);
+    for (size_t i = 0; i < gEstimatorsAccordingToX.size(); ++i) {
+        if (cur_x != gEstimatorsAccordingToX.at(i)->x) {
+            x.push_back(cur_x);
+            cur_x = gEstimatorsAccordingToX.at(i)->x;
+        }
+    }
+
+    vector<QCustomPlot *> errorCanvas(split - 1);
+    for (qint32 i = 0; i < split - 1; ++i) {
+        errorCanvas[i] = new QCustomPlot;
+        errorCanvas.at(i)->addGraph();
+        errorCanvas.at(i)->graph(0)->setPen(QPen(QColor(250, 128, 114)));
+        errorCanvas.at(i)->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 4));
+        errorCanvas.at(i)->plotLayout()->insertRow(0);
+        errorCanvas.at(i)->plotLayout()->addElement(0, 0, new QCPTextElement(errorCanvas.at(i), "水平方向" + QString::number(i + 1) + "/" + QString::number(split) + "处误差图", QFont(font().family(), 10, QFont::Bold)));
+        errorCanvas.at(i)->xAxis->setVisible(true);
+        errorCanvas.at(i)->xAxis->setTickLabels(true);
+        errorCanvas.at(i)->xAxis->setLabel(tr("水平方向"));
+        errorCanvas.at(i)->yAxis->setVisible(true);
+        errorCanvas.at(i)->yAxis->setTickLabels(true);
+        errorCanvas.at(i)->yAxis->setLabel(tr("误差(m)"));
+
+        double x_flag = x.at(x.size() / split * (i + 1));
+        bool is_first_find = true;
+        int count = 0;
+        for (size_t k = 0; k < gEstimatorsAccordingToX.size(); ++k) {
+            if (x_flag == gEstimatorsAccordingToX.at(k)->x) {
+                errorCanvas.at(i)->graph(0)->addData(count, gEstimatorsAccordingToX.at(k)->err);  // 实时绘图
+                count++;
+                is_first_find = false;
+            } else {
+                if (!is_first_find) {
+                    break;
+                }
+            }
+        }
+        errorCanvas.at(i)->xAxis->setRange(0, count);
+        errorCanvas.at(i)->yAxis->setRange(0, 0.1);
+        errorCanvas.at(i)->replot();
+
+        errorCanvas.at(i)->saveJpg("D:/我的文档/Qt/水平方向" + QString::number(i + 1) + "_" + QString::number(split) + "处误差图.jpg", 488, 485, 1, -1);  // TODO
+    }
+
+    for (size_t i = 0; i < errorCanvas.size(); ++i) {
+        delete errorCanvas.at(i);
+    }
+}
+
+void FourthWindow::PlotY(qint32 split) {
+    vector<double> y;
+    double cur_y = gEstimatorsAccordingToY.at(0)->y;
+    y.push_back(cur_y);
+    for (size_t i = 0; i < gEstimatorsAccordingToY.size(); ++i) {
+        if (cur_y != gEstimatorsAccordingToY.at(i)->y) {
+            y.push_back(cur_y);
+            cur_y = gEstimatorsAccordingToY.at(i)->y;
+        }
+    }
+
+    vector<QCustomPlot *> errorCanvas(split - 1);
+    for (qint32 i = 0; i < split - 1; ++i) {
+        errorCanvas[i] = new QCustomPlot;
+        errorCanvas.at(i)->addGraph();
+        errorCanvas.at(i)->graph(0)->setPen(QPen(QColor(250, 128, 114)));
+        errorCanvas.at(i)->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 4));
+        errorCanvas.at(i)->plotLayout()->insertRow(0);
+        errorCanvas.at(i)->plotLayout()->addElement(0, 0, new QCPTextElement(errorCanvas.at(i), "垂直方向" + QString::number(i + 1) + "/" + QString::number(split) + "处误差图", QFont(font().family(), 10, QFont::Bold)));
+        errorCanvas.at(i)->xAxis->setVisible(true);
+        errorCanvas.at(i)->xAxis->setTickLabels(true);
+        errorCanvas.at(i)->xAxis->setLabel(tr("垂直方向"));
+        errorCanvas.at(i)->yAxis->setVisible(true);
+        errorCanvas.at(i)->yAxis->setTickLabels(true);
+        errorCanvas.at(i)->yAxis->setLabel(tr("误差(m)"));
+
+        double y_flag = y.at(y.size() / split * (i + 1));
+        bool is_first_find = true;
+        int count = 0;
+        for (size_t k = 0; k < gEstimatorsAccordingToY.size(); ++k) {
+            if (y_flag == gEstimatorsAccordingToY.at(k)->y) {
+                errorCanvas.at(i)->graph(0)->addData(count, gEstimatorsAccordingToY.at(k)->err);  // 实时绘图
+                count++;
+                is_first_find = false;
+            } else {
+                if (!is_first_find) {
+                    break;
+                }
+            }
+        }
+        errorCanvas.at(i)->xAxis->setRange(0, count);
+        errorCanvas.at(i)->yAxis->setRange(0, 0.1);
+        errorCanvas.at(i)->replot();
+
+        errorCanvas.at(i)->saveJpg("D:/我的文档/Qt/垂直方向" + QString::number(i + 1) + "_" + QString::number(split) + "处误差图.jpg", 488, 485, 1, -1);  // TODO
+    }
+
+    for (size_t i = 0; i < errorCanvas.size(); ++i) {
+        delete errorCanvas.at(i);
+    }
+}
+
+
 void FourthWindow::PlotHeatMap() {
 }
 
@@ -433,4 +539,9 @@ void FourthWindow::SlotRightArrowClicked() {
 
 void FourthWindow::SlotOK() {}
 
-void FourthWindow::SlotEstimate() {}
+void FourthWindow::SlotEstimate() {
+    if (gXDivide->text() != "" && gYDivide->text() != "") {
+        PlotX(gXDivide->text().toUInt());
+        PlotY(gYDivide->text().toUInt());
+    }
+}

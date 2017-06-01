@@ -15,8 +15,8 @@ ThirdWindow::~ThirdWindow() {
     delete gPointCloudDataDenoisingButton;
     delete gPointCloudDataFittingButton;
     delete gPointCloudDataGraph;
-    delete series1;
-    delete series2;
+//    delete series1;
+//    delete series2;
 }
 
 void ThirdWindow::clear() {

@@ -136,9 +136,13 @@ void SecondWindow::SetWidgets() {
     /* right layout */
     gCustomPlot = new QCustomPlot;
     gCustomPlot->addGraph();
-    gCustomPlot->graph(0)->setPen(QPen(QColor(255, 110, 40)));
+    gCustomPlot->graph(0)->setPen(QPen(Qt::red));
     gCustomPlot->graph(0)->setLineStyle(QCPGraph::lsNone);
     gCustomPlot->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 3));
+    gCustomPlot->addGraph();
+    gCustomPlot->graph(1)->setPen(QPen(Qt::black));
+    gCustomPlot->graph(1)->setLineStyle(QCPGraph::lsNone);
+    gCustomPlot->graph(1)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 3));
     gCustomPlot->plotLayout()->insertRow(0);
     gCustomPlot->plotLayout()->addElement(0, 0, new QCPTextElement(gCustomPlot, tr("加工路径动态图"), QFont(font().family(), 12, QFont::Bold)));
     gCustomPlot->xAxis->setLabel(tr("X-板长方向(m)"));
@@ -147,6 +151,14 @@ void SecondWindow::SetWidgets() {
     gCustomPlot->yAxis->setLabel(tr("Y-板宽方向(m)"));
     gCustomPlot->yAxis->setVisible(true);
     gCustomPlot->yAxis->setTickLabels(true);
+    gCustomPlot->xAxis2->setVisible(true);
+    gCustomPlot->xAxis2->setTickLabels(false);
+    gCustomPlot->yAxis2->setVisible(true);
+    gCustomPlot->yAxis2->setTickLabels(false);
+    gCustomPlot->graph(0)->setName(tr("正面加工路径(红点)"));
+    gCustomPlot->graph(1)->setName(tr("反面加工路径(黑点)"));
+    gCustomPlot->legend->setVisible(true);
+    gCustomPlot->legend->setFont(QFont(font().family(), 10, QFont::Bold));
 
     QVBoxLayout * rightLayout = new QVBoxLayout;
     rightLayout->addWidget(gCustomPlot);
@@ -374,10 +386,15 @@ void SecondWindow::SlotReadPendingDatagrams() {
         double x = data[0].toDouble();
         double y = data[1].toDouble();
         int pathIndex = data[2].toInt();
-        // int flag = data[3].toInt();
+        int flag = data[3].toInt();
         if (pathIndex == gTaskList->size() + 1) {  // 加工完毕时，主工控机发送 [xxx，xxx，最大路径编号 + 1，xxx] 通知工艺规划计算机
             gLogger->append(tr("[+] 第") + QString::number(pathIndex - 1) + ("项任务处理完毕."));
             gTimer->stop();  // 停止加工计时
+            MyMessageBox msgBox;
+
+            msgBox.setText(tr("加工完毕！"));
+            msgBox.setStandardButtons(QMessageBox::Save);
+            msgBox.exec();
         }
         else {
             if (pathIndex != pathIndex_) {
@@ -395,8 +412,14 @@ void SecondWindow::SlotReadPendingDatagrams() {
                 gReduction->setText(QString::number(dataCell.at(5)));
                 gThermalParameter->setText(QString::number(dataCell.at(6)));
             }
-            gCustomPlot->graph(0)->addData(x, y);  // 实时绘图
-            gCustomPlot->graph(0)->rescaleAxes();
+            if (flag == 0) {
+                gCustomPlot->graph(0)->addData(x, y);  // 实时绘图
+                gCustomPlot->graph(0)->rescaleAxes();
+            }
+            else if (flag == 1){
+                gCustomPlot->graph(1)->addData(x, y);  // 实时绘图
+                gCustomPlot->graph(1)->rescaleAxes();
+            }
             gCustomPlot->replot();
         }
     }

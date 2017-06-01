@@ -66,6 +66,8 @@ private:
     void EstimateError();
     void Generate2DMatrixAccordingToX();
     void Generate2DMatrixAccordingToY();
+    void PlotX(qint32 split);
+    void PlotY(qint32 split);
     void PlotHeatMap();
     void ClearGraph();
 
