@@ -10,6 +10,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport network datavisuali
 
 TARGET = LaserQt
 TEMPLATE = app
+TEMPLATE += lib
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which as been marked as deprecated (the exact warnings
@@ -31,7 +32,9 @@ SOURCES += main.cpp\
     auxiliary_function.cpp \
     qcustomplot.cpp \
     stack_window.cpp \
-    custom_qlabel.cpp
+    custom_qlabel.cpp \
+    include_cpp/algorithm/kdtree.cpp
+
 
 HEADERS  += \
     fourth_window.h \
@@ -42,7 +45,9 @@ HEADERS  += \
     my_messagebox.h \
     qcustomplot.h \
     stack_window.h \
-    custom_qlabel.h
+    custom_qlabel.h \
+    include_cpp/algorithm/kdtree.h
+
 
 FORMS    +=
 
@@ -79,9 +84,36 @@ win32 {
     QMAKE_LFLAGS_RELEASE = "-Wl,-rpath,$$PWD/lib/libxl/lib64/"
 }
 
+# algorithm setting
+win32 {
+    INCLUDEPATH += include_cpp/algorithm
+} else {
+
+}
+
+# algorithm source
+SOURCES += include_cpp/algorithm/Filter.cpp \
+    include_cpp/algorithm/GridDivide.cpp \
+    include_cpp/algorithm/icp.cpp \
+    include_cpp/algorithm/icpPointToPlane.cpp \
+    include_cpp/algorithm/icpPointToPoint.cpp \
+    include_cpp/algorithm/matrix.cpp \
+    include_cpp/algorithm/PointCloudAlgorithm.cpp \
+    include_cpp/algorithm/readfile.cpp
+
+# algorithm header
+HEADERS += include_cpp/algorithm/Filter.h \
+    include_cpp/algorithm/GridDivide.h \
+    include_cpp/algorithm/icp.h \
+    include_cpp/algorithm/icpPointToPlane.h \
+    include_cpp/algorithm/icpPointToPoint.h \
+    include_cpp/algorithm/matrix.h \
+    include_cpp/algorithm/readfile.h
+
 # Boost setting
 win32 {
-
+    INCLUDEPATH += C:/Boost/include
+    INCLUDEPATH += C:/Boost/include/boost
 } else {
     INCLUDEPATH += /usr/local/include/boost
 }
