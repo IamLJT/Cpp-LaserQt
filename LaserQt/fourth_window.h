@@ -42,11 +42,11 @@ private:
     QCustomPlot * gErrorCanvas_00;
     QCustomPlot * gErrorCanvas_01;
     QCustomPlot * gErrorCanvas_02;
-    QtDataVisualization::Q3DScatter * gErrorCanvas_03;
     ClickedQLabel * gLeftArrowLabel;
     ClickedQLabel * gRightArrowLabel;
     QStackedWidget * gStackWin;
     int gStackWinIndex;
+    QLineEdit * gGlobalError;
     QLineEdit * gXStart;
     QLineEdit * gYStart;
     QLineEdit * gXEnd;
@@ -57,6 +57,8 @@ private:
     QString gObjectDataFile;
     QtDataVisualization::Q3DScatter * gPointCloudDataGraph;
     vector<struct estimator *> gEstimators;
+    vector<struct estimator *> gEstimatorsAccordingToX;  // TODO
+    vector<struct estimator *> gEstimatorsAccordingToY;  // TODO
 
     void CreateMainWindow();
     void SetWidgets();
