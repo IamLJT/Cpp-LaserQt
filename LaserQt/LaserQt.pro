@@ -86,6 +86,7 @@ win32 {
 # algorithm setting
 win32 {
     INCLUDEPATH += include_cpp/algorithm
+    # LIBS += -L$$PWD/winlib/algorithm -lalgorithm
 } else {
 
 }
@@ -106,3 +107,5 @@ win32 {
     INCLUDEPATH += include_cpp/kdtree
     LIBS += -L$$PWD/lib/kdtree -lkdtree
 }
+
+DISTFILES +=

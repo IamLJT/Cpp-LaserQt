@@ -71,18 +71,10 @@ void FourthWindow::SetWidgets() {
     gErrorCanvas_01->yAxis->setVisible(true);
     gErrorCanvas_01->yAxis->setTickLabels(false);
     gErrorCanvas_02 = new QCustomPlot;
-    gErrorCanvas_02->addGraph();
-    gErrorCanvas_02->plotLayout()->insertRow(0);
-    gErrorCanvas_02->plotLayout()->addElement(0, 0, new QCPTextElement(gErrorCanvas_02, tr("任意两点间误差图"), QFont(font().family(), 10, QFont::Bold)));
-    gErrorCanvas_02->xAxis->setVisible(true);
-    gErrorCanvas_02->xAxis->setTickLabels(false);
-    gErrorCanvas_02->yAxis->setVisible(true);
-    gErrorCanvas_02->yAxis->setLabel(tr("误差(m)"));
-    gErrorCanvas_02->yAxis->setRange(0, 0.1);
-    gErrorCanvas_02->xAxis2->setVisible(true);
-    gErrorCanvas_02->xAxis2->setTickLabels(false);
-    gErrorCanvas_02->yAxis2->setVisible(true);
-    gErrorCanvas_02->yAxis2->setTickLabels(false);
+    gErrorCanvas_02->setInteractions(QCP::iRangeDrag|QCP::iRangeZoom);
+    gErrorCanvas_02->axisRect()->setupFullAxesBox(true);
+    gErrorCanvas_02->xAxis->setLabel("x");
+    gErrorCanvas_02->yAxis->setLabel("y");
 
     gStackWin = new QStackedWidget;
     gStackWin->addWidget(gErrorCanvas_00);
@@ -558,7 +550,50 @@ void FourthWindow::SlotRightArrowClicked() {
     }
 }
 
-void FourthWindow::SlotOK() {}
+void FourthWindow::SlotOK() {
+    double xDim = (gEstimatorsAccordingToX.at(gEstimatorsAccordingToX.size() - 1)->x - gEstimatorsAccordingToX.at(0)->x) / 0.01 + 1;
+    double yDim = (gEstimatorsAccordingToY.at(gEstimatorsAccordingToY.size() - 1)->y - gEstimatorsAccordingToY.at(0)->y) / 0.01 + 1;
+
+    QCPColorMap * colorMap = new QCPColorMap(gErrorCanvas_02->xAxis, gErrorCanvas_02->yAxis);
+    colorMap->data()->setSize(ceil(xDim), ceil(yDim));
+    colorMap->data()->setRange(QCPRange(1, ceil(xDim)), QCPRange(1, ceil(yDim)));
+
+    map<string, double> data_map;
+    for (size_t i = 0; i < gEstimatorsAccordingToX.size(); ++i) {
+        data_map[(QString::number(gEstimatorsAccordingToX.at(i)->x) + "+" + QString::number(gEstimatorsAccordingToX.at(i)->y)).toStdString()] = gEstimatorsAccordingToX.at(i)->err;
+    }
+    qDebug() << data_map.size();
+
+    map<string, double>::iterator it;
+    double x_flag, y_flag;
+    for (int xIndex = 0; xIndex < ceil(xDim); ++xIndex) {
+        x_flag = gEstimatorsAccordingToX.at(0)->x + 0.01 * xIndex;
+        for (int yIndex = 0; yIndex < ceil(yDim); ++yIndex) {
+            y_flag = gEstimatorsAccordingToY.at(0)->y + 0.01 * yIndex;
+            it = data_map.find((QString::number(x_flag) + "+" + QString::number(y_flag)).toStdString());
+            if (it != data_map.end()) {
+                colorMap->data()->setCell(xIndex, yIndex, it->second);
+            } else {
+                colorMap->data()->setCell(xIndex, yIndex, 0.0);
+            }
+        }
+    }
+
+    QCPColorScale * colorScale = new QCPColorScale(gErrorCanvas_02);
+    gErrorCanvas_02->plotLayout()->addElement(0, 1, colorScale);  // add it to the right of the main axis
+    colorScale->setType(QCPAxis::atRight);
+    colorMap->setColorScale(colorScale);
+    colorScale->axis()->setLabel(tr("全局误差分布热力图"));
+    colorMap->setGradient(QCPColorGradient::gpPolar);
+    colorMap->rescaleDataRange();
+
+    QCPMarginGroup * marginGroup = new QCPMarginGroup(gErrorCanvas_02);
+    gErrorCanvas_02->axisRect()->setMarginGroup(QCP::msBottom | QCP::msTop, marginGroup);
+    colorScale->setMarginGroup(QCP::msBottom | QCP::msTop, marginGroup);
+    gErrorCanvas_02->rescaleAxes();
+
+    gErrorCanvas_02->replot();
+}
 
 void FourthWindow::SlotEstimate() {
     if (gXDivide->text() != "" && gYDivide->text() != "") {
