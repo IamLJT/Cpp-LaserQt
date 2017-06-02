@@ -100,7 +100,7 @@ void StackWindow::SlotNext() {
         gStackWin->setCurrentIndex(gStackWinIndex);
         gFourthWin->CopyObjectDataFilePath(gThirdWin->CopyObjectDataFilePath());
         gThirdWin->clear();
-        gFourthWin->InitWindow();
+        // gFourthWin->InitWindow();
     }
     else if (gStackWinIndex == 3) {
     }

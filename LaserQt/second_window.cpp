@@ -224,7 +224,7 @@ void SecondWindow::InitTaskQueue() {
 /*
  * 休眠函数
 */
-void SecondWindow::Sleep(size_t msec) {
+void SecondWindow::Sleep(const size_t &msec) {
     QTime dieTime = QTime::currentTime().addMSecs(msec);
     while (QTime::currentTime() < dieTime) QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
 }

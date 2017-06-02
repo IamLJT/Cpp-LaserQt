@@ -29,7 +29,7 @@ Street, Fifth Floor, Boston, MA 02110-1301, USA
 #include <queue>
 
 #include "matrix.h"
-#include "kdtree.h"
+#include "kd_tree.h"
 
 class Icp {
 

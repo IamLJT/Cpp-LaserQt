@@ -61,7 +61,7 @@ private:
     void CreateMainWindow();
     void SetWidgets();
     void InitTaskQueue();
-    void Sleep(size_t msec);
+    void Sleep(const size_t &msec);
     void InitSocket();
     void ClearGraph();
 
