@@ -77,7 +77,12 @@ void FourthWindow::SetWidgets() {
     gErrorCanvas_02->xAxis->setVisible(true);
     gErrorCanvas_02->xAxis->setTickLabels(false);
     gErrorCanvas_02->yAxis->setVisible(true);
-    gErrorCanvas_02->yAxis->setTickLabels(false);
+    gErrorCanvas_02->yAxis->setLabel(tr("误差(m)"));
+    gErrorCanvas_02->yAxis->setRange(0, 0.1);
+    gErrorCanvas_02->xAxis2->setVisible(true);
+    gErrorCanvas_02->xAxis2->setTickLabels(false);
+    gErrorCanvas_02->yAxis2->setVisible(true);
+    gErrorCanvas_02->yAxis2->setTickLabels(false);
 
     gStackWin = new QStackedWidget;
     gStackWin->addWidget(gErrorCanvas_00);
@@ -178,8 +183,10 @@ void FourthWindow::SetWidgets() {
 
 void FourthWindow::ClearGraph() {}
 
-void FourthWindow::CopyObjectDataFilePath(QString path) {
+void FourthWindow::CopyObjectDataFilePath(const QString &path) {
     gObjectDataFile = path;
+    // QtConcurrent::run(InitWindow);
+    InitWindow();
 }
 
 void FourthWindow::InitWindow() {
@@ -330,6 +337,10 @@ void FourthWindow::Generate2DMatrixAccordingToX() {
     gErrorCanvas_00->yAxis->setLabel(tr("误差(m)"));
     gErrorCanvas_00->xAxis->setRange(1, i);
     gErrorCanvas_00->yAxis->setRange(0, 0.1);
+    gErrorCanvas_00->xAxis2->setVisible(true);
+    gErrorCanvas_00->xAxis2->setTickLabels(false);
+    gErrorCanvas_00->yAxis2->setVisible(true);
+    gErrorCanvas_00->yAxis2->setTickLabels(false);
     gErrorCanvas_00->replot();
 }
 
@@ -370,10 +381,14 @@ void FourthWindow::Generate2DMatrixAccordingToY() {
     gErrorCanvas_01->yAxis->setLabel(tr("误差(m)"));
     gErrorCanvas_01->xAxis->setRange(1, i);
     gErrorCanvas_01->yAxis->setRange(0, 0.1);
+    gErrorCanvas_01->xAxis2->setVisible(true);
+    gErrorCanvas_01->xAxis2->setTickLabels(false);
+    gErrorCanvas_01->yAxis2->setVisible(true);
+    gErrorCanvas_01->yAxis2->setTickLabels(false);
     gErrorCanvas_01->replot();
 }
 
-void FourthWindow::PlotX(qint32 split) {
+void FourthWindow::PlotX(const qint32 &split) {
     vector<double> x;
     double cur_x = gEstimatorsAccordingToX.at(0)->x;
     x.push_back(cur_x);
@@ -398,6 +413,10 @@ void FourthWindow::PlotX(qint32 split) {
         errorCanvas.at(i)->yAxis->setVisible(true);
         errorCanvas.at(i)->yAxis->setTickLabels(true);
         errorCanvas.at(i)->yAxis->setLabel(tr("误差(m)"));
+        errorCanvas.at(i)->xAxis2->setVisible(true);
+        errorCanvas.at(i)->xAxis2->setTickLabels(false);
+        errorCanvas.at(i)->yAxis2->setVisible(true);
+        errorCanvas.at(i)->yAxis2->setTickLabels(false);
 
         double x_flag = x.at(x.size() / split * (i + 1));
         bool is_first_find = true;
@@ -417,7 +436,8 @@ void FourthWindow::PlotX(qint32 split) {
         errorCanvas.at(i)->yAxis->setRange(0, 0.1);
         errorCanvas.at(i)->replot();
 
-        errorCanvas.at(i)->saveJpg("D:/水平方向" + QString::number(i + 1) + "_" + QString::number(split) + "处误差图.jpg", 488, 485, 1, -1);  // TODO
+        errorCanvas.at(i)->saveJpg("D:/LaserQtCache/水平方向" + QString::number(i + 1) + "_" + QString::number(split) + "处误差图.jpg", 488, 485, 1, -1);  // TODO
+        gErrorImages << "D:/LaserQtCache/水平方向" + QString::number(i + 1) + "_" + QString::number(split) + "处误差图.jpg";
     }
 
     for (size_t i = 0; i < errorCanvas.size(); ++i) {
@@ -425,7 +445,7 @@ void FourthWindow::PlotX(qint32 split) {
     }
 }
 
-void FourthWindow::PlotY(qint32 split) {
+void FourthWindow::PlotY(const qint32 &split) {
     vector<double> y;
     double cur_y = gEstimatorsAccordingToY.at(0)->y;
     y.push_back(cur_y);
@@ -450,6 +470,10 @@ void FourthWindow::PlotY(qint32 split) {
         errorCanvas.at(i)->yAxis->setVisible(true);
         errorCanvas.at(i)->yAxis->setTickLabels(true);
         errorCanvas.at(i)->yAxis->setLabel(tr("误差(m)"));
+        errorCanvas.at(i)->xAxis2->setVisible(true);
+        errorCanvas.at(i)->xAxis2->setTickLabels(false);
+        errorCanvas.at(i)->yAxis2->setVisible(true);
+        errorCanvas.at(i)->yAxis2->setTickLabels(false);
 
         double y_flag = y.at(y.size() / split * (i + 1));
         bool is_first_find = true;
@@ -469,7 +493,8 @@ void FourthWindow::PlotY(qint32 split) {
         errorCanvas.at(i)->yAxis->setRange(0, 0.1);
         errorCanvas.at(i)->replot();
 
-        errorCanvas.at(i)->saveJpg("D:/垂直方向" + QString::number(i + 1) + "_" + QString::number(split) + "处误差图.jpg", 488, 485, 1, -1);  // TODO
+        errorCanvas.at(i)->saveJpg("D:/LaserQtCache/垂直方向" + QString::number(i + 1) + "_" + QString::number(split) + "处误差图.jpg", 488, 485, 1, -1);  // TODO
+        gErrorImages << "D:/LaserQtCache/垂直方向" + QString::number(i + 1) + "_" + QString::number(split) + "处误差图.jpg";
     }
 
     for (size_t i = 0; i < errorCanvas.size(); ++i) {
@@ -537,11 +562,22 @@ void FourthWindow::SlotOK() {}
 
 void FourthWindow::SlotEstimate() {
     if (gXDivide->text() != "" && gYDivide->text() != "") {
+        QDir dir("D:/LaserQtCache");
+        if (!dir.exists()) {
+            dir.mkdir("D:/LaserQtCache");
+        }
+
+        dir.setFilter(QDir::Files);
+        int fileCounter = dir.count();
+        for (int i = 0; i< fileCounter; ++i) {
+            dir.remove(dir[i]);
+        }
+
+        gErrorImages.clear();
         PlotX(gXDivide->text().toUInt());
         PlotY(gYDivide->text().toUInt());
-        MyMessageBox msgBox;
-        msgBox.setText(tr("误差评估图生成完毕!"));
-        msgBox.setStandardButtons(QMessageBox::Save);
-        msgBox.exec();
+
+        ImageViewer * viewer= new ImageViewer(0, gErrorImages);
+        viewer->show();
     }
 }

@@ -10,6 +10,7 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QStackedWidget>
+#include <QtConcurrent>
 #include <QtPrintSupport>
 #include <QVBoxLayout>
 #include "auxiliary_function.h"
@@ -17,6 +18,7 @@
 #include "my_messagebox.h"
 #include "qcustomplot.h"
 #include "kdtree.h"
+#include "image_viewer.h"
 
 struct estimator {
     double x;
@@ -34,8 +36,7 @@ class FourthWindow : public QWidget {
 public:
     explicit FourthWindow(QWidget *parent = 0);
     ~FourthWindow();
-    void CopyObjectDataFilePath(QString path);
-    void InitWindow();
+    void CopyObjectDataFilePath(const QString &path);
     void clear();
 
 private:
@@ -59,15 +60,17 @@ private:
     vector<struct estimator *> gEstimators;
     vector<struct estimator *> gEstimatorsAccordingToX;  // TODO
     vector<struct estimator *> gEstimatorsAccordingToY;  // TODO
+    QStringList gErrorImages;
 
     void CreateMainWindow();
     void SetWidgets();
+    void InitWindow();
     void InitErrorAnalysis();
     void EstimateError();
     void Generate2DMatrixAccordingToX();
     void Generate2DMatrixAccordingToY();
-    void PlotX(qint32 split);
-    void PlotY(qint32 split);
+    void PlotX(const qint32 &split);
+    void PlotY(const qint32 &split);
     void PlotHeatMap();
     void ClearGraph();
 

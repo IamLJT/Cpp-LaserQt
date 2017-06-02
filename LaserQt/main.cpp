@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
 
     /* app全局属性配置 */
     app.setApplicationName("LaserQt");
-    app.setApplicationDisplayName("LaserQt-v1.0");
+    app.setApplicationDisplayName("LaserQt - V1.0");
     app.setApplicationVersion("version 1.0");
     app.setWindowIcon(QIcon(":/img/ui/logo_32px.png"));
 

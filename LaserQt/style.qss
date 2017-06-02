@@ -45,3 +45,11 @@ QComboBox {
 QTableWidget {
     font-size: 12px;
 }
+
+QListWidget {
+    padding: 5px;
+}
+
+QListWidget::item {
+    padding: 5px;
+}

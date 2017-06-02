@@ -6,7 +6,7 @@
 
 QT       += core gui
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport network datavisualization xml
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport network datavisualization xml concurrent
 
 TARGET = LaserQt
 TEMPLATE = app
@@ -32,6 +32,7 @@ SOURCES += main.cpp\
     auxiliary_function.cpp \
     qcustomplot.cpp \
     custom_qlabel.cpp \
+    image_viewer.cpp
 
 
 HEADERS  += \
@@ -44,6 +45,7 @@ HEADERS  += \
     my_messagebox.h \
     qcustomplot.h \
     custom_qlabel.h \
+    image_viewer.h
 
 
 FORMS    +=
