@@ -28,7 +28,7 @@ double IcpPointToPlane::fitStep (double *T,const int32_t T_num,Matrix &R,Matrix 
 
 	// kd tree query + result
 	std::vector<float>	query(dim);
-	kdtree::KDTreeResultVector result;
+        kd_tree::KDTreeResultVector result;
 
 	// init matrix for point correspondences
 	Matrix p_m(active.size(),dim); // model
@@ -201,7 +201,7 @@ std::vector<int32_t> IcpPointToPlane::getInliers (double *T,const int32_t T_num,
 	// init inlier vector + query point + query result
 	vector<int32_t>            inliers;
 	std::vector<float>         query(dim);
-	kdtree::KDTreeResultVector neighbor;
+        kd_tree::KDTreeResultVector neighbor;
   
 	// dimensionality 2
 	if (dim==2) {
@@ -274,7 +274,7 @@ std::vector<int32_t> IcpPointToPlane::getInliers (double *T,const int32_t T_num,
 	return inliers;
 }
 
-void IcpPointToPlane::computeNormal (const kdtree::KDTreeResultVector &neighbors,double *M_normal,const double flatness) {
+void IcpPointToPlane::computeNormal (const kd_tree::KDTreeResultVector &neighbors,double *M_normal,const double flatness) {
   
 	// dimensionality 2
 	if (dim==2) {
@@ -340,7 +340,7 @@ void IcpPointToPlane::computeNormal (const kdtree::KDTreeResultVector &neighbors
 
 double* IcpPointToPlane::computeNormals (const int32_t num_neighbors,const double flatness) {
 	double *M_normal = (double*)malloc(M_tree->N*dim*sizeof(double));
-	kdtree::KDTreeResultVector neighbors;
+        kd_tree::KDTreeResultVector neighbors;
 	for (int32_t i=0; i<M_tree->N; i++) {
 	M_tree->n_nearest_around_point(i,0,num_neighbors,neighbors);
 	if (dim==2) computeNormal(neighbors,M_normal+i*2,flatness);
@@ -350,7 +350,7 @@ double* IcpPointToPlane::computeNormals (const int32_t num_neighbors,const doubl
 }
 
 vector<int> IcpPointToPlane::getNearest(int index, double r, vector<bool>& isvisited) {
-	kdtree::KDTreeResultVector neighbors;
+        kd_tree::KDTreeResultVector neighbors;
 	M_tree->r_nearest_around_point(index, 0, r, neighbors);
 	// 这里的neighbours中存的序号是M_tree里的序号
 	vector<int> res;
@@ -400,17 +400,17 @@ vector<vector<double>> IcpPointToPlane::getcluster(int min_p, double r, vector<b
 		if (temp.size() > 5 * dim)
 			res.push_back(temp);
 
-		double *m_temp = new double[temp.size()];
-		int k = 0;
-		for (auto c : temp)
-			m_temp[k++] = c;
-		const int MAX = 256;
-		char sPath[MAX];
-		getcwd(sPath, MAX_PATH);
+                //double *m_temp = new double[temp.size()];
+                //int k = 0;
+                //for (auto c : temp)
+                //	m_temp[k++] = c;
+                //const int MAX = 256;
+                //char sPath[MAX];
+                //getcwd(sPath, MAX_PATH);
 
-		strcat(sPath, "\\NewGrid_TempData2.txt");
+                //strcat(sPath, "\\NewGrid_TempData2.txt");
 		//WriteFile(sPath, M0, num, dim);
-		WriteFile(sPath, m_temp, temp.size() / dim, dim);
+                //WriteFile(sPath, m_temp, temp.size() / dim, dim);
 	}
 	return res;
 }

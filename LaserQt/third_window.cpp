@@ -211,10 +211,16 @@ void ThirdWindow::SlotScanPointCloudData() {
 }
 
 void ThirdWindow::SlotDenoisePointCloudData() {
-
+    const char * path = gScanningDataFile->text().toStdString().c_str();
+    int noise = PointCloudKThreshlod(path);
 }
 
 void ThirdWindow::SlotFitPointCloudData() {
+    const char * inpath = gScanningDataFile->text().toStdString().c_str();
+    bool isFilter = true;
+    const char * TargetPath = gObjectDataFile->text().toStdString().c_str();
+    PointCloudFitting(inpath, isFilter, TargetPath);
+
     series1->setMeshSmooth(QtDataVisualization::QAbstract3DSeries::MeshPoint);
     QtDataVisualization::QScatterDataArray data1;
     QFile f1(gObjectDataFile->text());

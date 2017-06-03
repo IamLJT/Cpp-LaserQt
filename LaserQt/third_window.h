@@ -14,6 +14,7 @@
 #include "auxiliary_function.h"
 #include "my_messagebox.h"
 #include "qcustomplot.h"
+#include "PointCloudAlgorithm.h"
 
 class QWidget;
 

@@ -640,5 +640,22 @@ void FourthWindow::SlotEstimate() {
 
 
 void FourthWindow::SlotOK() {
-
+    double x_start = gXStart->text().toDouble();
+    double y_start = gYStart->text().toDouble();
+    double x_end = gXEnd->text().toDouble();
+    double y_end = gYEnd->text().toDouble();
+    if ((x_start >= gEstimatorsAccordingToX.at(0)->x && x_start < x_end) &&
+        (y_start >= gEstimatorsAccordingToY.at(0)->y && y_start < y_end) &&
+        (x_end <= gEstimatorsAccordingToX.at(gEstimatorsAccordingToX.size() - 1)->x) &&
+        (y_end <= gEstimatorsAccordingToY.at(gEstimatorsAccordingToY.size() - 1)->y)) {
+        qDebug() << x_start;
+        qDebug() << y_start;
+        qDebug() << x_end;
+        qDebug() << y_end;
+    } else {
+        MyMessageBox msgBox;
+        msgBox.setText(tr("参数输入有误！"));
+        msgBox.setStandardButtons(QMessageBox::Yes);
+        msgBox.exec();
+    }
 }
