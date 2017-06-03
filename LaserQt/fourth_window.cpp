@@ -19,6 +19,7 @@ FourthWindow::~FourthWindow() {
     delete gErrorCanvas_00;
     delete gErrorCanvas_01;
     delete gErrorCanvas_02;
+    delete gErrorCanvas_03;
     delete gLeftArrowLabel;
     delete gRightArrowLabel;
     delete gStackWin;
@@ -75,11 +76,28 @@ void FourthWindow::SetWidgets() {
     gErrorCanvas_02->axisRect()->setupFullAxesBox(true);
     gErrorCanvas_02->xAxis->setLabel("x");
     gErrorCanvas_02->yAxis->setLabel("y");
+    gErrorCanvas_03 = new QCustomPlot;
+    gErrorCanvas_03->addGraph();
+    gErrorCanvas_03->graph(0)->setPen(QPen(QColor(250, 128, 114)));
+    gErrorCanvas_03->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 4));
+    gErrorCanvas_03->plotLayout()->insertRow(0);
+    gErrorCanvas_03->plotLayout()->addElement(0, 0, new QCPTextElement(gErrorCanvas_03, tr("任意两点间误差图"), QFont(font().family(), 10, QFont::Bold)));
+    gErrorCanvas_03->xAxis->setVisible(true);
+    gErrorCanvas_03->xAxis->setTickLabels(false);
+    gErrorCanvas_03->yAxis->setVisible(true);
+    gErrorCanvas_03->yAxis->setTickLabels(true);
+    gErrorCanvas_03->yAxis->setLabel(tr("误差(m)"));
+    gErrorCanvas_03->yAxis->setRange(0, 0.1);
+    gErrorCanvas_03->xAxis2->setVisible(true);
+    gErrorCanvas_03->xAxis2->setTickLabels(false);
+    gErrorCanvas_03->yAxis2->setVisible(true);
+    gErrorCanvas_03->yAxis2->setTickLabels(false);
 
     gStackWin = new QStackedWidget;
     gStackWin->addWidget(gErrorCanvas_00);
     gStackWin->addWidget(gErrorCanvas_01);
     gStackWin->addWidget(gErrorCanvas_02);
+    gStackWin->addWidget(gErrorCanvas_03);
     gStackWinIndex = 0;
     gStackWin->setCurrentIndex(gStackWinIndex);
 
@@ -496,84 +514,6 @@ void FourthWindow::PlotY(const qint32 &split) {
 
 
 void FourthWindow::PlotHeatMap() {
-}
-
-void FourthWindow::SlotLeftArrowClicked() {
-    if (gStackWinIndex == 0) {
-        gStackWinIndex = 2;
-    } else {
-        gStackWinIndex--;
-    }
-    gStackWin->setCurrentIndex(gStackWinIndex);
-    if (gStackWinIndex == 2) {
-        gXStart->setEnabled(true);
-        gYStart->setEnabled(true);
-        gXEnd->setEnabled(true);
-        gYEnd->setEnabled(true);
-        gOKButton->setEnabled(true);
-    } else {
-        gXStart->clear();
-        gXStart->setEnabled(false);
-        gYStart->clear();
-        gYStart->setEnabled(false);
-        gXEnd->clear();
-        gXEnd->setEnabled(false);
-        gYEnd->clear();
-        gYEnd->setEnabled(false);
-        gOKButton->setEnabled(false);
-    }
-}
-
-void FourthWindow::SlotRightArrowClicked() {
-    if (gStackWinIndex == 2) {
-        gStackWinIndex = 0;
-    } else {
-        gStackWinIndex++;
-    }
-    gStackWin->setCurrentIndex(gStackWinIndex);
-    if (gStackWinIndex == 2) {
-        gXStart->setEnabled(true);
-        gYStart->setEnabled(true);
-        gXEnd->setEnabled(true);
-        gYEnd->setEnabled(true);
-        gOKButton->setEnabled(true);
-    } else {
-        gXStart->clear();
-        gXStart->setEnabled(false);
-        gYStart->clear();
-        gYStart->setEnabled(false);
-        gXEnd->clear();
-        gXEnd->setEnabled(false);
-        gYEnd->clear();
-        gYEnd->setEnabled(false);
-        gOKButton->setEnabled(false);
-    }
-}
-
-void FourthWindow::SlotEstimate() {
-    if (gXDivide->text() != "" && gYDivide->text() != "") {
-        QDir dir("D:/LaserQtCache");
-        if (!dir.exists()) {
-            dir.mkdir("D:/LaserQtCache");
-        }
-
-        dir.setFilter(QDir::Files);
-        int fileCounter = dir.count();
-        for (int i = 0; i< fileCounter; ++i) {
-            dir.remove(dir[i]);
-        }
-
-        gErrorImages.clear();
-        PlotX(gXDivide->text().toUInt());
-        PlotY(gYDivide->text().toUInt());
-
-        ImageViewer * viewer= new ImageViewer(0, gErrorImages);
-        viewer->show();
-    }
-}
-
-
-void FourthWindow::SlotOK() {
     double xDim = (gEstimatorsAccordingToX.at(gEstimatorsAccordingToX.size() - 1)->x - gEstimatorsAccordingToX.at(0)->x) / 0.01 + 1;
     double yDim = (gEstimatorsAccordingToY.at(gEstimatorsAccordingToY.size() - 1)->y - gEstimatorsAccordingToY.at(0)->y) / 0.01 + 1;
 
@@ -616,4 +556,89 @@ void FourthWindow::SlotOK() {
     gErrorCanvas_02->rescaleAxes();
 
     gErrorCanvas_02->replot();
+}
+
+void FourthWindow::SlotLeftArrowClicked() {
+    if (gStackWinIndex == 0) {
+        gStackWinIndex = 3;
+    } else {
+        gStackWinIndex--;
+    }
+    gStackWin->setCurrentIndex(gStackWinIndex);
+    if (gStackWinIndex == 3) {
+        gXStart->setEnabled(true);
+        gYStart->setEnabled(true);
+        gXEnd->setEnabled(true);
+        gYEnd->setEnabled(true);
+        gOKButton->setEnabled(true);
+    } else {
+        gXStart->clear();
+        gXStart->setEnabled(false);
+        gYStart->clear();
+        gYStart->setEnabled(false);
+        gXEnd->clear();
+        gXEnd->setEnabled(false);
+        gYEnd->clear();
+        gYEnd->setEnabled(false);
+        gOKButton->setEnabled(false);
+    }
+}
+
+void FourthWindow::SlotRightArrowClicked() {
+    if (gStackWinIndex == 3) {
+        gStackWinIndex = 0;
+    } else {
+        gStackWinIndex++;
+    }
+    gStackWin->setCurrentIndex(gStackWinIndex);
+    if (gStackWinIndex == 3) {
+        gXStart->setEnabled(true);
+        gYStart->setEnabled(true);
+        gXEnd->setEnabled(true);
+        gYEnd->setEnabled(true);
+        gOKButton->setEnabled(true);
+
+        MyMessageBox msgBox;
+        msgBox.setText("X轴限定范围为[" + QString::number(gEstimatorsAccordingToX.at(0)->x) + ", " + QString::number(gEstimatorsAccordingToX.at(gEstimatorsAccordingToX.size() - 1)->x) + "]， 步进值为0.01\n"
+                       "Y轴限定范围为[" + QString::number(gEstimatorsAccordingToY.at(0)->y) + ", " + QString::number(gEstimatorsAccordingToY.at(gEstimatorsAccordingToY.size() - 1)->y) + "]， 步进值为0.01");
+        msgBox.setStandardButtons(QMessageBox::Yes);
+        msgBox.exec();
+    } else {
+        gXStart->clear();
+        gXStart->setEnabled(false);
+        gYStart->clear();
+        gYStart->setEnabled(false);
+        gXEnd->clear();
+        gXEnd->setEnabled(false);
+        gYEnd->clear();
+        gYEnd->setEnabled(false);
+        gOKButton->setEnabled(false);
+    }
+}
+
+void FourthWindow::SlotEstimate() {
+    if (gXDivide->text() != "" && gYDivide->text() != "") {
+        QDir dir("D:/LaserQtCache");
+        if (!dir.exists()) {
+            dir.mkdir("D:/LaserQtCache");
+        }
+
+        dir.setFilter(QDir::Files);
+        int fileCounter = dir.count();
+        for (int i = 0; i< fileCounter; ++i) {
+            dir.remove(dir[i]);
+        }
+
+        gErrorImages.clear();
+        PlotX(gXDivide->text().toUInt());
+        PlotY(gYDivide->text().toUInt());
+
+        ImageViewer * viewer= new ImageViewer(0, gErrorImages);
+        viewer->show();
+    }
+}
+
+
+void FourthWindow::SlotOK() {
+
 }

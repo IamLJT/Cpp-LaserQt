@@ -93,8 +93,7 @@ win32 {
 
 # Boost setting
 win32 {
-    INCLUDEPATH += C:/Boost/include
-    INCLUDEPATH += C:/Boost/include/boost
+    INCLUDEPATH += D:/boost/include/boost
 } else {
     INCLUDEPATH += /usr/local/include/boost
 }

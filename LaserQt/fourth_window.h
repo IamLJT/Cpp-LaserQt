@@ -43,6 +43,7 @@ private:
     QCustomPlot * gErrorCanvas_00;
     QCustomPlot * gErrorCanvas_01;
     QCustomPlot * gErrorCanvas_02;
+    QCustomPlot * gErrorCanvas_03;
     ClickedQLabel * gLeftArrowLabel;
     ClickedQLabel * gRightArrowLabel;
     QStackedWidget * gStackWin;
