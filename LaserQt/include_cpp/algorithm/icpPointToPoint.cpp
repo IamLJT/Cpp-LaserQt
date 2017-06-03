@@ -27,7 +27,7 @@ double IcpPointToPoint::fitStep (double *T,const int32_t T_num,Matrix &R,Matrix 
   
 	// kd tree query + result
 	std::vector<float>         query(dim);
-    kd_tree::KDTreeResultVector result;
+	kdtree::KDTreeResultVector result;
   
 	// init matrix for point correspondences
 	Matrix p_m(active.size(),dim); // model
@@ -129,7 +129,7 @@ std::vector<int32_t> IcpPointToPoint::getInliers (double *T,const int32_t T_num,
 	// init inlier vector + query point + query result
 	vector<int32_t>            inliers;
 	std::vector<float>         query(dim);
-    kd_tree::KDTreeResultVector neighbor;
+	kdtree::KDTreeResultVector neighbor;
   
 	// dimensionality 2
 	if (dim==2) {

@@ -11,7 +11,7 @@
 #include <algorithm>
 #include <iostream>
 
-namespace kd_tree {
+namespace kdtree {
 // utility
   
 	inline float squared(const float x) {
