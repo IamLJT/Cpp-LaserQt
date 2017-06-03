@@ -75,8 +75,8 @@ private:
 protected:
   
 	// kd tree of model points
-	kdtree::KDTree*     M_tree;
-	kdtree::KDTreeArray M_data;
+    kd_tree::KDTree*     M_tree;
+    kd_tree::KDTreeArray M_data;
   
 	int32_t dim;       // dimensionality of model + template data (2 or 3)
 	int32_t sub_step;  // subsampling step size

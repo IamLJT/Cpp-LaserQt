@@ -15,7 +15,7 @@
 #include <boost\multi_array.hpp>
 #include <boost\array.hpp>
 
-namespace kdtree {
+namespace kd_tree {
   
   typedef boost::multi_array<float, 2>           KDTreeArray;
   typedef boost::const_multi_array_ref<float, 2> KDTreeROArray;

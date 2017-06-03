@@ -14,6 +14,7 @@
 #include "auxiliary_function.h"
 #include "my_messagebox.h"
 #include "qcustomplot.h"
+#include "Pointcloudalgorithm.h"
 
 class QWidget;
 
@@ -38,6 +39,7 @@ private:
     QtDataVisualization::Q3DScatter * gPointCloudDataGraph;
     QtDataVisualization::QScatter3DSeries * series1;
     QtDataVisualization::QScatter3DSeries * series2;
+    Pointcloudalgorithm *pointcloud;
 
     void CreateMainWindow();
     void SetWidgets();

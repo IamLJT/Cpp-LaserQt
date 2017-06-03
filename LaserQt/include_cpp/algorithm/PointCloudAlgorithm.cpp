@@ -6,6 +6,7 @@
 #include "icpPointToPlane.h"
 #include "readfile.h"
 #include "GridDivide.h"
+#include "Pointcloudalgorithm.h"
 
 using namespace std;
 
@@ -31,7 +32,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
     return TRUE;
 }
 
-extern "C" _declspec(dllexport) int PointCloudKThreshlod(const char* Path) {
+int Pointcloudalgorithm::PointCloudKThreshlod(const char* Path) {
 	int32_t dim = 3, num = 0, m = 0, n = 0;
 	vector<int> DataFile(4, 0);
 	double *M = ReadFile(Path, DataFile);
@@ -81,43 +82,21 @@ extern "C" _declspec(dllexport) int PointCloudKThreshlod(const char* Path) {
 	griddivide Grid_temp(M_cluster, num, dim);
 	Grid_temp.dividenum(15, 15, 20);
 	Grid_temp.grid_point(M_cluster, num, dim);
-	double* M_e0 = Grid_temp.first_filter_grid(M_cluster, num_G, dim, 0.6 * Grid_temp.GetInterval());
+	double* M_e0 = Grid_temp.first_filter_grid(M_cluster, num_G, dim, 
+	0.6 * Grid_temp.GetInterval());
 
 	char sPath[MAX];
 	getcwd(sPath, MAX_PATH);
-	strcat(sPath, "\\LaserQt_Material\\TempData.txt");
+	strcat(sPath, "/cache/TempData.txt");
 	WriteFile(sPath, M_e0, num_G, dim);
 
 	return num-num_G;
 }
-/*
-extern "C" _declspec(dllexport) void PointCloudDenoise() {
+void Pointcloudalgorithm::PointCloudFitting(const char *inPath, 
+bool isFilter, const char *TargetData) {
 	char Path[MAX];
 	getcwd(Path, MAX_PATH);
-	strcat(Path, "\\LaserQt_Material\\TempData.txt");
-
-	int32_t dim = 3, num = 0, m = 0, n = 0;
-	vector<int> DataFile(4, 0);
-	double *M = ReadFile(Path, DataFile);
-
-	num = DataFile[0];
-	dim = DataFile[1];
-	m = DataFile[2];
-	n = DataFile[3];
-
-	Filter flr(M, num, dim, m, n);
-	double *M0 = flr.SimpleFilter();
-
-	flr.copyData(M0, dim, m, n);
-	M0 = flr.bFilter2();
-
-	WriteFile(Path, M0, num, dim);
-}
-*/
-extern "C" _declspec(dllexport) void PointCloudFitting(const char *inPath, bool isFilter, const char *TargetData) {
-	char Path[MAX];
-	getcwd(Path, MAX_PATH);
-	strcat(Path, "\\LaserQt_Material\\TempData.txt");
+	strcat(Path, "/cache/TempData.txt");
 
 	int32_t dim = 3, num = 0, m = 0, n = 0;
 	vector<int> DataFile(4, 0);
@@ -161,7 +140,7 @@ extern "C" _declspec(dllexport) void PointCloudFitting(const char *inPath, bool 
 
 	char OutPath[MAX];
 	getcwd(OutPath, MAX_PATH);
-	strcat(OutPath, "\\LaserQt_Material\\FittingData.txt");
+    strcat(OutPath, "/cache/FittingData.txt");
 
 	//cout << mx.m << endl;
 
