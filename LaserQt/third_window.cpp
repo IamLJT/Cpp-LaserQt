@@ -241,7 +241,7 @@ void ThirdWindow::SlotFitPointCloudData() {
 
     series2->setMeshSmooth(QtDataVisualization::QAbstract3DSeries::MeshSphere);
     QtDataVisualization::QScatterDataArray data2;
-    QFile f2(gScanningDataFile->text());
+    QFile f2(gScanningDataFile->text().toStdString().c_str());
     if (f2.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QTextStream txtInput(&f2);
         QString line;
