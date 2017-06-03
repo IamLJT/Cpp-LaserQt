@@ -1,9 +1,0 @@
-License
-
-Name:Michael Hillier
-key:windows-2723210a07c4e90162b26966a8jcdboe
-
-usage:
-
-Book* book= xlCreateBook( );
-book->setKey(L"Michael Hillier", L"windows-222329040ec5ec046fb46767a7h1gej6");

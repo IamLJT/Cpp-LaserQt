@@ -1,16 +1,8 @@
 <RCC>
     <qresource prefix="/img">
-        <file>ui/edit.png</file>
-        <file>ui/exit.png</file>
         <file>ui/folder.png</file>
-        <file>ui/forbidden.png</file>
         <file>ui/logo_32px.png</file>
         <file>ui/logo_72px.png</file>
-        <file>ui/next.png</file>
-        <file>ui/ok.png</file>
-        <file>ui/previous.png</file>
-        <file>ui/update.png</file>
-        <file>ui/browse.png</file>
         <file>ui/arrow_left.png</file>
         <file>ui/arrow_right.png</file>
     </qresource>
