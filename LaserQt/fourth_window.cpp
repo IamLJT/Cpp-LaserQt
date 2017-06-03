@@ -105,39 +105,39 @@ void FourthWindow::SetWidgets() {
     gGlobalError = new QLineEdit;
     gGlobalError->setEnabled(false);
     leftMiddleLayout->addWidget(gGlobalError, 0, 1);
-    leftMiddleLayout->addWidget(new QLabel(tr("起点Ｘ坐标")), 1, 0);
-    gXStart = new QLineEdit;
-    gXStart->setEnabled(false);
-    leftMiddleLayout->addWidget(gXStart, 1, 1);
-    leftMiddleLayout->addWidget(new QLabel(tr("起点Y坐标")), 1, 2);
-    gYStart = new QLineEdit;
-    gYStart->setEnabled(false);
-    leftMiddleLayout->addWidget(gYStart, 1, 3);
-    leftMiddleLayout->addWidget(new QLabel(tr("终点Ｘ坐标")), 2, 0);
-    gXEnd = new QLineEdit;
-    gXEnd->setEnabled(false);
-    leftMiddleLayout->addWidget(gXEnd, 2, 1);
-    leftMiddleLayout->addWidget(new QLabel(tr("终点Y坐标")), 2, 2);
-    gYEnd = new QLineEdit;
-    gYEnd->setEnabled(false);
-    leftMiddleLayout->addWidget(gYEnd, 2, 3);
 
-    /* left-bottom layout */
-    gOKButton = new QPushButton(tr("确定"));
-    gOKButton->setEnabled(false);
-    connect(gOKButton, SIGNAL(clicked()), this, SLOT(SlotOK()));
-    leftMiddleLayout->addWidget(gOKButton, 2, 4);
-
-    leftMiddleLayout->addWidget(new QLabel(tr("X方向均分")), 3, 0);
+    leftMiddleLayout->addWidget(new QLabel(tr("X方向均分")), 1, 0);
     gXDivide = new QLineEdit;
-    leftMiddleLayout->addWidget(gXDivide, 3, 1);
-    leftMiddleLayout->addWidget(new QLabel(tr("Y方向均分")), 3, 2);
+    leftMiddleLayout->addWidget(gXDivide, 1, 1);
+    leftMiddleLayout->addWidget(new QLabel(tr("Y方向均分")), 1, 2);
     gYDivide = new QLineEdit;
-    leftMiddleLayout->addWidget(gYDivide, 3, 3);
+    leftMiddleLayout->addWidget(gYDivide, 1, 3);
 
     QPushButton * estimateButton = new QPushButton(tr("评估"));
     connect(estimateButton, SIGNAL(clicked()), this, SLOT(SlotEstimate()));
-    leftMiddleLayout->addWidget(estimateButton, 3, 4);
+    leftMiddleLayout->addWidget(estimateButton, 1, 4);
+
+    leftMiddleLayout->addWidget(new QLabel(tr("起点Ｘ坐标")), 2, 0);
+    gXStart = new QLineEdit;
+    gXStart->setEnabled(false);
+    leftMiddleLayout->addWidget(gXStart, 2, 1);
+    leftMiddleLayout->addWidget(new QLabel(tr("起点Y坐标")), 2, 2);
+    gYStart = new QLineEdit;
+    gYStart->setEnabled(false);
+    leftMiddleLayout->addWidget(gYStart, 2, 3);
+    leftMiddleLayout->addWidget(new QLabel(tr("终点Ｘ坐标")), 3, 0);
+    gXEnd = new QLineEdit;
+    gXEnd->setEnabled(false);
+    leftMiddleLayout->addWidget(gXEnd, 3, 1);
+    leftMiddleLayout->addWidget(new QLabel(tr("终点Y坐标")), 3, 2);
+    gYEnd = new QLineEdit;
+    gYEnd->setEnabled(false);
+    leftMiddleLayout->addWidget(gYEnd, 3, 3);
+
+    gOKButton = new QPushButton(tr("确定"));
+    gOKButton->setEnabled(false);
+    connect(gOKButton, SIGNAL(clicked()), this, SLOT(SlotOK()));
+    leftMiddleLayout->addWidget(gOKButton, 3, 4);
 
     /* left layout */
     QVBoxLayout * leftLayout = new QVBoxLayout;
@@ -550,6 +550,29 @@ void FourthWindow::SlotRightArrowClicked() {
     }
 }
 
+void FourthWindow::SlotEstimate() {
+    if (gXDivide->text() != "" && gYDivide->text() != "") {
+        QDir dir("D:/LaserQtCache");
+        if (!dir.exists()) {
+            dir.mkdir("D:/LaserQtCache");
+        }
+
+        dir.setFilter(QDir::Files);
+        int fileCounter = dir.count();
+        for (int i = 0; i< fileCounter; ++i) {
+            dir.remove(dir[i]);
+        }
+
+        gErrorImages.clear();
+        PlotX(gXDivide->text().toUInt());
+        PlotY(gYDivide->text().toUInt());
+
+        ImageViewer * viewer= new ImageViewer(0, gErrorImages);
+        viewer->show();
+    }
+}
+
+
 void FourthWindow::SlotOK() {
     double xDim = (gEstimatorsAccordingToX.at(gEstimatorsAccordingToX.size() - 1)->x - gEstimatorsAccordingToX.at(0)->x) / 0.01 + 1;
     double yDim = (gEstimatorsAccordingToY.at(gEstimatorsAccordingToY.size() - 1)->y - gEstimatorsAccordingToY.at(0)->y) / 0.01 + 1;
@@ -593,26 +616,4 @@ void FourthWindow::SlotOK() {
     gErrorCanvas_02->rescaleAxes();
 
     gErrorCanvas_02->replot();
-}
-
-void FourthWindow::SlotEstimate() {
-    if (gXDivide->text() != "" && gYDivide->text() != "") {
-        QDir dir("D:/LaserQtCache");
-        if (!dir.exists()) {
-            dir.mkdir("D:/LaserQtCache");
-        }
-
-        dir.setFilter(QDir::Files);
-        int fileCounter = dir.count();
-        for (int i = 0; i< fileCounter; ++i) {
-            dir.remove(dir[i]);
-        }
-
-        gErrorImages.clear();
-        PlotX(gXDivide->text().toUInt());
-        PlotY(gYDivide->text().toUInt());
-
-        ImageViewer * viewer= new ImageViewer(0, gErrorImages);
-        viewer->show();
-    }
 }

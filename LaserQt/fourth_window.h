@@ -77,8 +77,8 @@ private:
 private slots:
     void SlotLeftArrowClicked();
     void SlotRightArrowClicked();
-    void SlotOK();
     void SlotEstimate();
+    void SlotOK();
 };
 
 #endif // FORTHWINDOW_H
