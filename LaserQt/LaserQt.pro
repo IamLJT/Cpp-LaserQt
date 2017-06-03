@@ -106,3 +106,7 @@ win32 {
     INCLUDEPATH += include_cpp/kdtree
     LIBS += -L$$PWD/lib/kdtree -lkdtree
 }
+
+DISTFILES += \
+    include_cpp/algorithm/Makefile \
+    include_cpp/algorithm/build.bat

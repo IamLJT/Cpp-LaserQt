@@ -11,7 +11,7 @@ using namespace std;
 
 #ifndef _MAX_
 	#define MAX 256
-#endif _MAX_
+#endif
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
     switch (ul_reason_for_call) {
@@ -44,10 +44,10 @@ extern "C" _declspec(dllexport) int PointCloudKThreshlod(const char* Path) {
 	griddivide_new Grid_new0(M, num, dim);
 	Grid_new0.gridpoint(M, 0.02);
 	int count = 0;
-	// µÚÒ»²½¼ò»¯Êý¾Ý
+	// ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	double* M_new = Grid_new0.grid_filter(M, count, 5, 1);
 
-	// ÓÃkmeans¾ÛÀà
+	// ï¿½ï¿½kmeansï¿½ï¿½ï¿½ï¿½
 	griddivide_new Grid_new(M_new, count, dim);
 	vector<vector<double>> temp_cluster = Grid_new.grid_kmeans(M_new, 2, count);
 
@@ -77,7 +77,7 @@ extern "C" _declspec(dllexport) int PointCloudKThreshlod(const char* Path) {
 
 	double *M0 = flr.ThresholdFilter(20);*/
 
-	int num_G = 0; // ÐÂµÄµãÊý
+	int num_G = 0; // ï¿½ÂµÄµï¿½ï¿½ï¿½
 	griddivide Grid_temp(M_cluster, num, dim);
 	Grid_temp.dividenum(15, 15, 20);
 	Grid_temp.grid_point(M_cluster, num, dim);

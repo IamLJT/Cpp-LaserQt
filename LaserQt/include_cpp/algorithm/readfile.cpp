@@ -4,7 +4,7 @@
 
 #ifndef _MAX_
 #define MAX 256
-#endif _MAX_
+#endif
 
 struct id
 {
@@ -38,7 +38,7 @@ int cmp(Point3d p1, Point3d p2)
 }
 
 void ReadxyzFile(const char* Path)
-	//	¶ÁÈ¡.xyzÎÄ¼þ
+	//	ï¿½ï¿½È¡.xyzï¿½Ä¼ï¿½
 {
 	FILE *fp = fopen(Path, "r");
 	if(fp == NULL)
@@ -47,32 +47,32 @@ void ReadxyzFile(const char* Path)
 		return;
 	}
 
-	//	»ñÈ¡ÐÐÊý£¬¼´µãµÄÊýÁ¿£¬ÓÃÓÚÉèÖÃstd::vectorµÄÈÝÁ¿
+	//	ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½std::vectorï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	const int BUFSIZE = 512;
 	char buf[BUFSIZE];
 	int rowNumber = 0;
-	while(fgets(buf, BUFSIZE, fp) != NULL)	//	ÐÐ¶ÁÈ¡
+	while(fgets(buf, BUFSIZE, fp) != NULL)	//	ï¿½Ð¶ï¿½È¡
 	{
 		++ rowNumber;
 	}
 	fclose(fp);
 	fp = 0;
 
-	//	ÖØÐÂ´ò¿ªÎÄ¼þ
+	//	ï¿½ï¿½ï¿½Â´ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½
 	fp = fopen(Path, "r");
 	id pointID;
 	Point3d pointXYZ;
 	Point3d pointColor;
 
 	std::vector<id> vecPtID;
-	std::vector<Point3d> vecPtXYZ;		//	µã×ø±ê
-	std::vector<Point3d> vecPtColor;	//	ÑÕÉ«
+	std::vector<Point3d> vecPtXYZ;		//	ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	std::vector<Point3d> vecPtColor;	//	ï¿½ï¿½É«
 
 	vecPtID.reserve(rowNumber);
 	vecPtXYZ.reserve(rowNumber);
 	vecPtColor.reserve(rowNumber);
 
-	//	Êý¾Ý¶ÁÈ¡
+	//	ï¿½ï¿½ï¿½Ý¶ï¿½È¡
 	while(fgets(buf, BUFSIZE, fp) != NULL)
 	{
 		sscanf(buf, "%f %f %f %f %f %f %f %f",
@@ -101,8 +101,8 @@ void ReadxyzFile(const char* Path)
 	char sPath[MAX];
 	getcwd(sPath, MAX_PATH);
 
-	strcat(sPath, "\\ÌáÈ¡Êý¾Ý.txt");
-	FILE *ifp = fopen(sPath, "w+");	//	ÒÔÐ´ÎÄ¼þµÄ·½Ê½´ò¿ª£¬ÔÙ¹Ø±Õ¼´ÊÇÇå¿ÕÎÄ¼þ
+	strcat(sPath, "\\ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½.txt");
+	FILE *ifp = fopen(sPath, "w+");	//	ï¿½ï¿½Ð´ï¿½Ä¼ï¿½ï¿½Ä·ï¿½Ê½ï¿½ò¿ª£ï¿½ï¿½Ù¹Ø±Õ¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½
 	fclose(ifp);
 	WriteFile(sPath, M, rowNumber, 3);
 	delete [] M;
@@ -125,7 +125,7 @@ double* ReadFile(const char* strPath, std::vector<int>& DataFile, int mode)
 	std::vector<double> vec;
 	int num = 0, dim = 3;
 	double idata1, idata2, idata3;
-	while(!feof(fp))	//	¶ÁÈ¡txtÎÄ¼þ£¬¸ñÊ½ÊÇÃ¿ÐÐx,y,z
+	while(!feof(fp))	//	ï¿½ï¿½È¡txtï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½Ê½ï¿½ï¿½Ã¿ï¿½ï¿½x,y,z
 	{
 		if (mode == 1)
 			fscanf(fp, "%lf,%lf,%lf\n", &idata1,&idata2,&idata3);
