@@ -26,9 +26,13 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 
 int PointCloudKThreshlod(const char * Path) {
 
+    printf("进入滤波程序\n");
 	int32_t dim = 3, num = 0, m = 0, n = 0;
 	vector<int> DataFile(4, 0);
-	double * M = ReadFile(Path, DataFile);
+	//char p[] = "C:\\Users\\SummyChou\\Desktop\\src.txt";
+    double * M = ReadFile(Path, DataFile);
+
+    printf("ReadFile成功%s\n", Path);
 
 	num = DataFile[0];
 	dim = DataFile[1];
@@ -67,9 +71,11 @@ int PointCloudKThreshlod(const char * Path) {
 	for (auto c : temp_cluster[index])
 		M_cluster[k++] = c;
 
-	/*Filter flr(M, num, dim, m, n);
+        printf("分类成功\n");
 
-	double *M0 = flr.ThresholdFilter(20);*/
+        /*Filter flr(M, num, dim, m, n);
+
+        double *M0 = flr.ThresholdFilter(20);*/
 
 	int num_G = 0; // �µĵ���
 	griddivide Grid_temp(M_cluster, num, dim);
@@ -77,18 +83,24 @@ int PointCloudKThreshlod(const char * Path) {
 	Grid_temp.grid_point(M_cluster, num, dim);
 	double* M_e0 = Grid_temp.first_filter_grid(M_cluster, num_G, dim, 0.6 * Grid_temp.GetInterval());
 
-	char sPath[MAX];
-	getcwd(sPath, MAX_PATH);
-	strcat(sPath, "/cache/TempData.txt");
-    WriteFile(sPath, M_e0, num_G, dim);
+    //    printf("网格去噪成功\n");
 
-	return num-num_G;
+	char sPath[MAX] = "D:\\TempData.txt";
+	//getcwd(sPath, MAX_PATH);
+
+    //printf("获取当前路径\n");
+	//strcat(sPath, "\\cache\\TempData.txt");
+        WriteFile(sPath, M_e0, num_G, dim);
+
+        return num-num_G;
+
+        return 0;
 }
 
 void PointCloudFitting(const char *inPath, bool isFilter, const char *TargetData) {
-	char Path[MAX];
-	getcwd(Path, MAX_PATH);
-	strcat(Path, "/cache/TempData.txt");
+	char Path[MAX] = "D:\\TempData.txt";
+	//getcwd(Path, MAX_PATH);
+	//strcat(Path, "D:\\TempData.txt");
 
 	int32_t dim = 3, num = 0, m = 0, n = 0;
 	vector<int> DataFile(4, 0);
@@ -130,9 +142,9 @@ void PointCloudFitting(const char *inPath, bool isFilter, const char *TargetData
 		M0[idx*3+2] = r20*mx.val[idx][0] + r21*mx.val[idx][1] + r22*mx.val[idx][2] + t2;
 	}
 
-	char OutPath[MAX];
-	getcwd(OutPath, MAX_PATH);
-	strcat(OutPath, "/cache/FittingData.txt");
+	char OutPath[MAX] = "D:\\FittingData.txt";
+	//getcwd(OutPath, MAX_PATH);
+	//strcat(OutPath, "D:\\FittingData.txt");
 
 	//cout << mx.m << endl;
 

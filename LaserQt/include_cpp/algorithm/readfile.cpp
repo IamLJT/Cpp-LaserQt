@@ -121,10 +121,16 @@ double* ReadFile(const char* strPath, std::vector<int>& DataFile, int mode)
 		vec.push_back(idata);	//	can't read?
 	}	*/
 	FILE *fp;
-	fp = fopen(strPath, "r");
+	printf("%s\n",strPath);
+	fp = fopen(strPath, "rt");
+	
 	std::vector<double> vec;
+	
+
 	int num = 0, dim = 3;
 	double idata1, idata2, idata3;
+	if (fp != NULL){
+		printf("success to open file\n");
 	while(!feof(fp))	//	��ȡtxt�ļ�����ʽ��ÿ��x,y,z
 	{
 		if (mode == 1)
@@ -140,11 +146,16 @@ double* ReadFile(const char* strPath, std::vector<int>& DataFile, int mode)
 	DataFile[1] = dim;
 	DataFile[2] = idata1;
 	DataFile[3] = idata2;
+	}
+	else {
+		printf("failed to open file\n");
+	}
 	double *M = new double[(int)vec.size()];
 	for(int i=0; i<(int)vec.size(); i++)
 		M[i]=vec[i];
 	vec.clear();
 	//num=(int)vec.size()/3;		//	icp need it!
+	
 	fclose(fp);
 	return M;
 }

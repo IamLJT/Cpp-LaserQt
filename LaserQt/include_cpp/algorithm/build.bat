@@ -9,6 +9,7 @@ g++ -O3 -std=c++11 -c -o PointCloudAlgorithm.o PointCloudAlgorithm.cpp -DBUILD_D
 g++ -O3 -std=c++11 -c -o readfile.o readfile.cpp -DBUILD_DLL -ID:/boost/include -LD:/boost/lib
 
 g++ -shared -o libalgorithm.dll Filter.o GridDivide.o icp.o icpPointToPlane.o icpPointToPoint.o kd_tree.o matrix.o PointCloudAlgorithm.o readfile.o
+move libalgorithm.dll ../../winlib/algorithm
 
 del Filter.o
 del GridDivide.o
@@ -18,3 +19,5 @@ del icpPointToPoint.o
 del kd_tree.o matrix.o
 del PointCloudAlgorithm.o
 del readfile.o
+
+pause
