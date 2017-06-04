@@ -59,9 +59,12 @@ private:
     QString gObjectDataFile;
     QtDataVisualization::Q3DScatter * gPointCloudDataGraph;
     vector<struct estimator *> gEstimators;
-    vector<struct estimator *> gEstimatorsAccordingToX;  // TODO
-    vector<struct estimator *> gEstimatorsAccordingToY;  // TODO
+    vector<struct estimator *> gEstimatorsAccordingToX;
+    vector<struct estimator *> gEstimatorsAccordingToY;
     QStringList gErrorImages;
+    double xDim;
+    double yDim;
+    double ** g2DErrorMatrix;
 
     void CreateMainWindow();
     void SetWidgets();

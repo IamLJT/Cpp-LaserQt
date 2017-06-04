@@ -514,8 +514,8 @@ void FourthWindow::PlotY(const qint32 &split) {
 
 
 void FourthWindow::PlotHeatMap() {
-    double xDim = (gEstimatorsAccordingToX.at(gEstimatorsAccordingToX.size() - 1)->x - gEstimatorsAccordingToX.at(0)->x) / 0.01 + 1;
-    double yDim = (gEstimatorsAccordingToY.at(gEstimatorsAccordingToY.size() - 1)->y - gEstimatorsAccordingToY.at(0)->y) / 0.01 + 1;
+    xDim = (gEstimatorsAccordingToX.at(gEstimatorsAccordingToX.size() - 1)->x - gEstimatorsAccordingToX.at(0)->x) / 0.01 + 1;
+    yDim = (gEstimatorsAccordingToY.at(gEstimatorsAccordingToY.size() - 1)->y - gEstimatorsAccordingToY.at(0)->y) / 0.01 + 1;
 
     QCPColorMap * colorMap = new QCPColorMap(gErrorCanvas_02->xAxis, gErrorCanvas_02->yAxis);
     colorMap->data()->setSize(ceil(xDim), ceil(yDim));
@@ -525,19 +525,23 @@ void FourthWindow::PlotHeatMap() {
     for (size_t i = 0; i < gEstimatorsAccordingToX.size(); ++i) {
         data_map[(QString::number(gEstimatorsAccordingToX.at(i)->x) + "+" + QString::number(gEstimatorsAccordingToX.at(i)->y)).toStdString()] = gEstimatorsAccordingToX.at(i)->err;
     }
-    qDebug() << data_map.size();
+
+    g2DErrorMatrix = new double * [int(xDim) + 1];  // TODO
 
     map<string, double>::iterator it;
     double x_flag, y_flag;
     for (int xIndex = 0; xIndex < ceil(xDim); ++xIndex) {
+        g2DErrorMatrix[xIndex] = new double[int(yDim) + 1];  // TODO
         x_flag = gEstimatorsAccordingToX.at(0)->x + 0.01 * xIndex;
         for (int yIndex = 0; yIndex < ceil(yDim); ++yIndex) {
             y_flag = gEstimatorsAccordingToY.at(0)->y + 0.01 * yIndex;
             it = data_map.find((QString::number(x_flag) + "+" + QString::number(y_flag)).toStdString());
             if (it != data_map.end()) {
                 colorMap->data()->setCell(xIndex, yIndex, it->second);
+                g2DErrorMatrix[xIndex][yIndex] = it->second;  // TODO
             } else {
                 colorMap->data()->setCell(xIndex, yIndex, 0.0);
+                g2DErrorMatrix[xIndex][yIndex] = 0.0;  // TODO
             }
         }
     }
@@ -648,10 +652,30 @@ void FourthWindow::SlotOK() {
         (y_start >= gEstimatorsAccordingToY.at(0)->y && y_start < y_end) &&
         (x_end <= gEstimatorsAccordingToX.at(gEstimatorsAccordingToX.size() - 1)->x) &&
         (y_end <= gEstimatorsAccordingToY.at(gEstimatorsAccordingToY.size() - 1)->y)) {
-        qDebug() << x_start;
-        qDebug() << y_start;
-        qDebug() << x_end;
-        qDebug() << y_end;
+
+        double k = (y_end - y_start) / (x_end - x_start);
+
+        int xIndex, yIndex;
+        if ((y_end - y_start) > (x_end - x_start)) {
+            xIndex = (y_end - y_start) / 0.01 + 1;
+            yIndex = (x_end - x_start) / 0.01 + 1;
+        } else {
+            xIndex = (x_end - x_start) / 0.01 + 1;
+            yIndex = (y_end - y_start) / 0.01 + 1;
+        }
+
+        double x, y;
+        for (int i = 0; i < xIndex; ++i) {
+            for (int j = 0; j < yIndex; ++ij) {
+
+            }
+        }
+
+        for (int i = 0; i < ceil(xDim); ++i) {
+            delete [] g2DErrorMatrix[i];
+        }
+        delete [] g2DErrorMatrix;
+        g2DErrorMatrix = NULL;
     } else {
         MyMessageBox msgBox;
         msgBox.setText(tr("参数输入有误！"));
