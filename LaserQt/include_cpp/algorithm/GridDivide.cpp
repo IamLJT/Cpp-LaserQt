@@ -42,6 +42,9 @@ void griddivide::grid_point(double *M, const int32_t M_num, const int32_t dim)
 		int grid_y = ((int)((y - min_y) / interval_y));
 		int grid_z = ((int)((z - min_z) / interval_z));
 		int size = point.size();
+		//调试所用
+		//if (grid_x + grid_y * n_x + grid_z * n_x * n_y >= n_x * n_y * n_z)
+		//	printf("%d %d %d %f %f %f %d %d %d\n", n_x, n_y, n_z, x, y, z, grid_x, grid_y, grid_z);
 		Pointxyz.push_back(Point_xyz(x, y, z, grid_x, grid_y, grid_z, size));
 		point[grid_x + grid_y * n_x + grid_z * n_x * n_y].push_back(i);
 	}
@@ -504,42 +507,45 @@ Matrix fit_plane(double* M, int dim, int num)
 
 // 2017/04/20修改网格划分和聚类方法
 griddivide_new::griddivide_new(double* M, const int32_t M_num, const int32_t dim)
-	: min_x(DBL_MAX), max_x(-min_x), min_y(DBL_MAX),
-	  max_y(-min_y), min_z(DBL_MAX), max_z(-min_z),
+	: min_x(DBL_MAX), max_x(-(min_x-1)), min_y(DBL_MAX),
+	  max_y(-(min_y-1)), min_z(DBL_MAX), max_z(-(min_z-1)),
 	  num(M_num), dim(dim) {
 	for (int i = 0; i<M_num; i++) {
 		if (min_x > M[i*dim + 0])
 			min_x = M[i*dim + 0];
-		if (max_x < M[i*dim + 0])
+		else if (max_x < M[i*dim + 0])
 			max_x = M[i*dim + 0];
 		if (min_y > M[i*dim + 1])
 			min_y = M[i*dim + 1];
-		if (max_y < M[i*dim + 1])
+		else if (max_y < M[i*dim + 1])
 			max_y = M[i*dim + 1];
 		if (min_z > M[i*dim + 2])
 			min_z = M[i*dim + 2];
-		if (max_z < M[i*dim + 2])
+		else if (max_z < M[i*dim + 2])
 			max_z = M[i*dim + 2];
 	}
 }
 
 void griddivide_new::gridpoint(double* M, double cubsize) {
 	// cubsize为网格的边长
-	n_x = (int)((max_x - min_x) / cubsize + 0.5);
-	n_y = (int)((max_y - min_y) / cubsize + 0.5);
-	n_z = (int)((max_z - min_z) / cubsize + 0.5);
+	n_x = (int)((max_x - min_x) / cubsize) + 1;
+	n_y = (int)((max_y - min_y) / cubsize) + 1;
+	n_z = (int)((max_z - min_z) / cubsize) + 1;
 	point.resize(n_x*n_y*n_z);
 
 	for (int i = 0; i < num; i++) {
 		double x = M[i*dim + 0];
 		double y = M[i*dim + 1];
 		double z = M[i*dim + 2];
-		if (z == NAN) continue;
+		if (isnan(z)) continue;
 
 		// 三维空间长a、宽b、高c的坐标表示为a+b*nx+c*nx*ny
 		int grid_x = ((int)((x - min_x) / cubsize));
 		int grid_y = ((int)((y - min_y) / cubsize));
 		int grid_z = ((int)((z - min_z) / cubsize));
+		// 调试所用
+		//if (grid_x + grid_y * n_x + grid_z * n_x * n_y >= n_x * n_y * n_z)
+		//	printf("%d %d %d %f %f %f %d %d %d\n", n_x, n_y, n_z, x, y, z, grid_x, grid_y, grid_z);
 		point[grid_x + grid_y * n_x + grid_z * n_x * n_y].push_back(i);
 	}
 }
@@ -560,6 +566,8 @@ double* griddivide_new::grid_filter(double* M, int& count, int min_p, int mode) 
 			vector<double> tmp_p;
 			double temp_x = 0, temp_y = 0, temp_z = 0;
 			for (int j = 0; j < point[i].size(); ++j) {
+				double z = M[point[i][j] * dim + 2];
+				if (isnan(z)) continue;
 				temp_x += M[point[i][j] * dim + 0];
 				temp_y += M[point[i][j] * dim + 1];
 				temp_z += M[point[i][j] * dim + 2];
@@ -589,7 +597,12 @@ double* griddivide_new::grid_filter(double* M, int& count, int min_p, int mode) 
 		for (int i = 0; i < n_x * n_y * n_z; ++i) {
 			if (point[i].size() < min_p)
 				continue;
-			for (int j = 0; j < point[i].size(); j++) {
+			for (int j = 0; j < point[i].size() && k <= count; ++j) {
+				double z = M[point[i][j] * dim + 2];
+				if (isnan(z)) {
+					count--;
+					continue;
+				}
 				M_new[k * dim + 0] = M[point[i][j] * dim + 0];
 				M_new[k * dim + 1] = M[point[i][j] * dim + 1];
 				M_new[k * dim + 2] = M[point[i][j] * dim + 2];

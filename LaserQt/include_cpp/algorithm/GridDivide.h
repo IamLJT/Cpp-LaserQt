@@ -3,6 +3,7 @@
 
 #include "matrix.h"
 #include "float.h"
+#include "math.h"
 #include "icpPointToPlane.h"
 #include <vector>
 #include <algorithm>
@@ -81,6 +82,7 @@ public:
 	void gridpoint(double* M, double cubsize);
 	double* grid_filter(double* M, int& count, int min_p, int mode = 1);
 	vector<vector<double>> grid_kmeans(double* M, int k, int num);
+	double GetMax_x() { return max_x - min_x; }
 
 private:
 	double min_x, max_x;

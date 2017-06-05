@@ -387,9 +387,6 @@ vector<vector<double>> IcpPointToPlane::getcluster(int min_p, double r, vector<b
 				temp.push_back(M_tree->the_data[t][2]);
 				for (int j = 0; j < tmp_p.size(); ++j) {
 					q.push(tmp_p[j]);
-					//temp.push_back(M_tree->the_data[tmp_p[j]][0]);
-					//temp.push_back(M_tree->the_data[tmp_p[j]][1]);
-					//temp.push_back(M_tree->the_data[tmp_p[j]][2]);
 					isvisited[tmp_p[j]] = 1;
 				}
 			}
@@ -399,18 +396,6 @@ vector<vector<double>> IcpPointToPlane::getcluster(int min_p, double r, vector<b
 		}
 		if (temp.size() > 5 * dim)
 			res.push_back(temp);
-
-                //double *m_temp = new double[temp.size()];
-                //int k = 0;
-                //for (auto c : temp)
-                //	m_temp[k++] = c;
-                //const int MAX = 256;
-                //char sPath[MAX];
-                //getcwd(sPath, MAX_PATH);
-
-                //strcat(sPath, "\\NewGrid_TempData2.txt");
-		//WriteFile(sPath, M0, num, dim);
-                //WriteFile(sPath, m_temp, temp.size() / dim, dim);
 	}
 	return res;
 }
