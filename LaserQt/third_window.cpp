@@ -160,6 +160,7 @@ void ThirdWindow::SlotOpenObjectDataFile() {
     QString filePath = QFileDialog::getOpenFileName(this, tr("选择文件"), QString::fromStdString(GetWorkDirectory()), tr("Text File(*.txt)"));
     if (filePath != "") {
         gObjectDataFile->setText(filePath);
+        gPointCloudDataScanningButton->setEnabled(true);
     }
 }
 
@@ -167,7 +168,6 @@ void ThirdWindow::SlotOpenScanningDataFile() {
     QString filePath = QFileDialog::getOpenFileName(this, tr("选择文件"), QString::fromStdString(GetWorkDirectory()), tr("Text File(*.txt)"));
     if (filePath != "") {
         gScanningDataFile->setText(filePath);
-        gPointCloudDataScanningButton->setEnabled(true);
         gPointCloudDataFittingButton->setEnabled(true);
     }
 }
@@ -213,6 +213,10 @@ void ThirdWindow::SlotScanPointCloudData() {
 void ThirdWindow::SlotDenoisePointCloudData() {
     const char * path = gScanningDataFile->text().toStdString().c_str();
     int noise = PointCloudKThreshlod(path);
+    MyMessageBox msgBox;
+    msgBox.setText(tr("本次点云去噪总计去除") + QString::number(noise) + tr("个噪声点！"));
+    msgBox.setStandardButtons(QMessageBox::Save);
+    msgBox.exec();
 }
 
 void ThirdWindow::SlotFitPointCloudData() {
@@ -239,7 +243,7 @@ void ThirdWindow::SlotFitPointCloudData() {
 
     series2->setMeshSmooth(QtDataVisualization::QAbstract3DSeries::MeshSphere);
     QtDataVisualization::QScatterDataArray data2;
-    QFile f2(gScanningDataFile->text().toStdString().c_str());
+    QFile f2("E:/FittingData.txt");  // TODO
     if (f2.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QTextStream txtInput(&f2);
         QString line;

@@ -220,7 +220,7 @@ void FourthWindow::InitWindow() {
     QtDataVisualization::QScatter3DSeries * series2 = new QtDataVisualization::QScatter3DSeries;
     series2->setMeshSmooth(QtDataVisualization::QAbstract3DSeries::MeshSphere);
     QtDataVisualization::QScatterDataArray data2;
-    QFile f2(":/cache/cache/输出数据.txt");
+    QFile f2("D:/FittingData.txt");
     if (f2.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QTextStream txtInput(&f2);
         QString line;
@@ -252,7 +252,7 @@ void FourthWindow::InitErrorAnalysis() {
 void FourthWindow::EstimateError() {
     struct kdtree * kd = kd_create(3);
 
-    QFile f1(":/cache/cache/输出数据.txt");
+    QFile f1("D:/FittingData.txt");  // TODO
     if (f1.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QTextStream txtInput(&f1);
         QString line;
@@ -266,7 +266,7 @@ void FourthWindow::EstimateError() {
     }
 
     QVector<QVector3D> * points = new QVector<QVector3D>;
-    QFile f2(gObjectDataFile);
+    QFile f2(gObjectDataFile);  // TODO
     if (f2.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QTextStream txtInput(&f2);
         QString line;

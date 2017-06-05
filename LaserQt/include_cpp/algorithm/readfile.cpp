@@ -4,7 +4,7 @@
 
 #ifndef _MAX_
 #define MAX 256
-#endif _MAX_
+#endif
 
 struct id {
 	id() { m = n = 0; }
@@ -101,24 +101,29 @@ void ReadxyzFile(const char* Path) {
 }
 
 // 读取普通的txt
-double* ReadFile(const char* strPath, int &num_p, int& dim_p, int mode)	 {
+double* ReadFile(const char* strPath, int& num_p, int& dim_p, int mode)	 {
 	FILE *fp;
 	fp = fopen(strPath, "r");
 	std::vector<double> vec;
 	int num = 0, dim = 3;
 	double idata1, idata2, idata3;
-	while(!feof(fp)) {
-		if (mode == 1) //	读取txt文件，格式是每行x,y,z\n或者x,y,z\r
-			if (fscanf(fp, "%lf,%lf,%lf\n", &idata1, &idata2, &idata3) == 0)
+	if (fp != NULL) {
+		printf("success to open file\n");
+		while(!feof(fp)) {
+			if (mode == 1) //	读取txt文件，格式是每行x,y,z\n或者x,y,z
 				fscanf(fp, "%lf,%lf,%lf", &idata1, &idata2, &idata3);
-			else if (mode == 2) //	读取txt文件，格式是每行x y z\n或者x y z\r
-				if (fscanf(fp, "%lf %lf %lf\n", &idata1, &idata2, &idata3) == 0)
-					fscanf(fp, "%lf %lf %lf", &idata1, &idata2, &idata3);
-		vec.push_back(idata1);
-		vec.push_back(idata2);
-		vec.push_back(idata3);
-		num++;
+			else if (mode == 2) //	读取txt文件，格式是每行x y z\n或者x y z
+				fscanf(fp, "%lf %lf %lf", &idata1, &idata2, &idata3);
+			vec.push_back(idata1);
+			vec.push_back(idata2);
+			vec.push_back(idata3);
+			num++;
+		}
 	}
+	else {
+		printf("failed to open file\n");
+	}
+	
 	num_p = num;
 	dim_p = dim;
 	// 重新保存到double类型的数组中
@@ -133,7 +138,9 @@ double* ReadFile(const char* strPath, int &num_p, int& dim_p, int mode)	 {
 void WriteFile(char* strPath, double* M, int32_t num, int32_t dim)
 {
 	FILE *fp;
-	fp = fopen(strPath, "w");
+	fp = fopen(strPath, "w+");
+	if (fp != NULL) {
+		printf("success to open writefile\n");
 	for(int i=0; i<num*dim; i+=dim) {
 		// 最后一行不需要换行
 		if(i<(num-1)*dim)
@@ -141,5 +148,8 @@ void WriteFile(char* strPath, double* M, int32_t num, int32_t dim)
 		else
 			fprintf(fp, "%lf,%lf,%lf", M[i], M[i+1], M[i+2]);
 	}
+	}
+	else 
+		printf("failed to open writefile\n");
 	fclose(fp);
 }
