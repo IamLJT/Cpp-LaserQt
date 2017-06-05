@@ -666,7 +666,7 @@ void FourthWindow::SlotOK() {
 
         double x, y;
         for (int i = 0; i < xIndex; ++i) {
-            for (int j = 0; j < yIndex; ++ij) {
+            for (int j = 0; j < yIndex; ++j) {
 
             }
         }

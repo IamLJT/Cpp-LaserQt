@@ -6,38 +6,9 @@ using namespace std;
 	#define MAX 256
 #endif
 
-BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
-    switch (ul_reason_for_call) {
-		case DLL_PROCESS_ATTACH:
-			printf("DLL_PROCESS_ATTACH\n");
-			break;
-		case DLL_THREAD_ATTACH:
-			printf("DLL_THREAD_ATTACH\n");
-			break;
-		case DLL_THREAD_DETACH:
-			printf("DLL_THREAD_DETACH\n");
-			break;
-		case DLL_PROCESS_DETACH:
-			printf("DLL_PROCESS_DETACH\n");
-			break;
-	}
-    return TRUE;
-}
-
 int PointCloudKThreshlod(const char * Path) {
-
-    printf("进入滤波程序\n");
 	int32_t dim = 3, num = 0, m = 0, n = 0;
-	vector<int> DataFile(4, 0);
-	//char p[] = "C:\\Users\\SummyChou\\Desktop\\src.txt";
-    double * M = ReadFile(Path, DataFile);
-
-    printf("ReadFile成功%s\n", Path);
-
-	num = DataFile[0];
-	dim = DataFile[1];
-	m = DataFile[2];
-	n = DataFile[3];
+    double * M = ReadFile(Path, num, dim);
 
 	griddivide_new Grid_new0(M, num, dim);
 	Grid_new0.gridpoint(M, 0.02);
@@ -71,50 +42,29 @@ int PointCloudKThreshlod(const char * Path) {
 	for (auto c : temp_cluster[index])
 		M_cluster[k++] = c;
 
-        printf("分类成功\n");
-
-        /*Filter flr(M, num, dim, m, n);
-
-        double *M0 = flr.ThresholdFilter(20);*/
-
 	int num_G = 0; // �µĵ���
 	griddivide Grid_temp(M_cluster, num, dim);
 	Grid_temp.dividenum(15, 15, 20);
 	Grid_temp.grid_point(M_cluster, num, dim);
 	double* M_e0 = Grid_temp.first_filter_grid(M_cluster, num_G, dim, 0.6 * Grid_temp.GetInterval());
 
-    //    printf("网格去噪成功\n");
 
 	char sPath[MAX] = "D:\\TempData.txt";
-	//getcwd(sPath, MAX_PATH);
+    WriteFile(sPath, M_e0, num_G, dim);
 
-    //printf("获取当前路径\n");
-	//strcat(sPath, "\\cache\\TempData.txt");
-        WriteFile(sPath, M_e0, num_G, dim);
-
-        return num-num_G;
-
-        return 0;
+    return num-num_G;
 }
 
 void PointCloudFitting(const char *inPath, bool isFilter, const char *TargetData) {
 	char Path[MAX] = "D:\\TempData.txt";
-	//getcwd(Path, MAX_PATH);
-	//strcat(Path, "D:\\TempData.txt");
 
 	int32_t dim = 3, num = 0, m = 0, n = 0;
-	vector<int> DataFile(4, 0);
 	double *M;
-	double *T = ReadFile(TargetData, DataFile);
+	double *T = ReadFile(TargetData, num, dim);
 	if(false == isFilter)
-		M = ReadFile(inPath, DataFile);
+		M = ReadFile(inPath, num, dim);
 	else
-		M = ReadFile(Path, DataFile);
-
-	num = DataFile[0];
-	dim = DataFile[1];
-	m = DataFile[2];
-	n = DataFile[3];
+		M = ReadFile(Path, num, dim);
 	// start with identity as initial transformation
 	// in practice you might want to use some kind of prediction here
 	Matrix R = Matrix::eye(3);
@@ -143,10 +93,6 @@ void PointCloudFitting(const char *inPath, bool isFilter, const char *TargetData
 	}
 
 	char OutPath[MAX] = "D:\\FittingData.txt";
-	//getcwd(OutPath, MAX_PATH);
-	//strcat(OutPath, "D:\\FittingData.txt");
-
-	//cout << mx.m << endl;
 
 	WriteFile(OutPath, M0, num, dim);
 }
