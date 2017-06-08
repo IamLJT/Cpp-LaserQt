@@ -235,7 +235,7 @@ void SecondWindow::Sleep(const size_t &msec) {
 void SecondWindow::InitSocket() {
     gUDPSocket = new QUdpSocket;
     gHostAddress.setAddress(gProcessMachineIP);
-    gUDPSocket->bind(gHostAddress, gProcessMachinePort);  // IP和端口从xml/config.xml文件中获取
+    gUDPSocket->bind(gProcessMachinePort, QUdpSocket::ShareAddress);  // IP和端口从xml/config.xml文件中获取
     connect(gUDPSocket, SIGNAL(readyRead()), this, SLOT(SlotReadPendingDatagrams()));
 }
 
