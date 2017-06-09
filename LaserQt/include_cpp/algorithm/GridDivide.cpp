@@ -37,14 +37,11 @@ void griddivide::grid_point(double *M, const int32_t M_num, const int32_t dim)
 		double z = M[i*dim + 2];
 		if (isnan(z)) continue;
 
-		// ÈýÎ¬¿Õ¼ä³¤a¡¢¿íb¡¢¸ßcµÄ×ø±ê±íÊ¾Îªa+b*nx+c*nx*ny
+		// ??????a????b????c?????????a+b*nx+c*nx*ny
 		int grid_x = ((int)((x - min_x) / interval_x));
 		int grid_y = ((int)((y - min_y) / interval_y));
 		int grid_z = ((int)((z - min_z) / interval_z));
 		int size = point.size();
-		//µ÷ÊÔËùÓÃ
-		//if (grid_x + grid_y * n_x + grid_z * n_x * n_y >= n_x * n_y * n_z)
-		//	printf("%d %d %d %f %f %f %d %d %d\n", n_x, n_y, n_z, x, y, z, grid_x, grid_y, grid_z);
 		Pointxyz.push_back(Point_xyz(x, y, z, grid_x, grid_y, grid_z, size));
 		point[grid_x + grid_y * n_x + grid_z * n_x * n_y].push_back(i);
 	}
@@ -53,7 +50,7 @@ void griddivide::grid_point(double *M, const int32_t M_num, const int32_t dim)
 void griddivide::grid_fitcurve(double * M, vector<int>& p, 
 	double threshold, int pos, const int dim)
 {
-	// »ñÈ¡·¨ÏòÁ¿
+	// ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	double* T = new double[p.size() * 3];
 	for (int i = 0; i < p.size(); ++i) {
 		T[i * dim + 0] = M[p[i] * dim + 0];
@@ -63,7 +60,7 @@ void griddivide::grid_fitcurve(double * M, vector<int>& p,
 	IcpPointToPlane icp(T, p.size(), dim, 3);
 	double *M_normal = icp.getM_normal();
 
-	// »ñÈ¡Æ½¾ùµã
+	// ï¿½ï¿½È¡Æ½ï¿½ï¿½ï¿½ï¿½
 	int grid_z = pos / (n_x*n_y);
 	int grid_y = (pos % (n_x*n_y)) / n_x;
 	int grid_x = (pos % (n_x*n_y)) % n_x;
@@ -78,7 +75,7 @@ void griddivide::grid_fitcurve(double * M, vector<int>& p,
 	P_aver.y = P_aver.y / len;
 	P_aver.z = P_aver.z / len;
 
-	// ÇóËùÓÐµãµ½Æ½¾ùµãµÄ¾àÀë¼°¸ÃµãµÄÈ¨ÖØºÍ×Ü·¨ÏòÁ¿
+	// ?????ï¿½ï¿½?????????????????????????
 	vector<double> dist(p.size(), 0), w(p.size(), 0);
 	double max_dist = 0;
 	vector<double> N(3, 0);
@@ -90,7 +87,7 @@ void griddivide::grid_fitcurve(double * M, vector<int>& p,
 			max_dist = temp;
 	}
 	for (int i = 0; i < p.size(); ++i) {
-		w[i] = (1 - dist[i] / max_dist) + 0.2; // ÈËÎª¶¨ÒåµÄÈ¨ÖØ
+		w[i] = (1 - dist[i] / max_dist) + 0.2; // ???????????
 		N[0] += M_normal[i * dim + 0] * w[i] / p.size();
 		N[1] += M_normal[i * dim + 1] * w[i] / p.size();
 		N[2] += M_normal[i * dim + 2] * w[i] / p.size();
@@ -102,25 +99,13 @@ void griddivide::grid_fitcurve(double * M, vector<int>& p,
 	N = DivideVector(N, norm_p(N));
 	vector<double> D = cross_product(p_aver, N);
 
-	// ÖØÐÂÐÞÕý×ø±êµã£¬ÒÔP_averÎªÔ­µã£¬×Ü·¨ÏòÁ¿ÎªzÖá
+	// ï¿½ï¿½ï¿½ï¿½ï¿½Ðµãµ½Æ½ï¿½ï¿½ï¿½ï¿½Ä¾ï¿½ï¿½ë¼°ï¿½Ãµï¿½ï¿½È¨ï¿½Øºï¿½ï¿½Ü·ï¿½ï¿½ï¿½ï¿½ï¿½
 	double *M_new = new double[p.size() * 3];
 	for (int i = 0; i < p.size(); ++i) {
 		vector<double> P_j(3, 0), N_j(3, 0), P_n(3, 0);
 		P_j[0] = M[p[i] * dim + 0];
 		P_j[1] = M[p[i] * dim + 1];
 		P_j[2] = M[p[i] * dim + 2];
-		//N_j[0] = M_normal[i * dim + 0];
-		//N_j[1] = M_normal[i * dim + 1];
-		//N_j[2] = M_normal[i * dim + 2];
-
-		//// ÇóÍø¸ñµãµ½Î¢Æ½ÃæµÄÓÐÏò¾àÀë
-		//vector<double> d_n = AddVector(D, dot_product(N_j, P_j));
-		//P_n = SubVector(P_j, cross_product(d_n, N));
-		//vector<double> u = DivideVector(P_n, norm_p(P_n));
-		//vector<double> v = cross_product(N, u);
-		//M_new[i * dim + 0] = dot_product(P_n, u);
-		//M_new[i * dim + 1] = dot_product(P_n, v);
-		//M_new[i * dim + 2] = norm_p(d_n);
 		
 		double d_n = dot_product(N, SubVector(P_j, p_aver));
 		P_n = SubVector(SubVector(P_j, p_aver), cross_product(N, abs(d_n)));
@@ -129,28 +114,26 @@ void griddivide::grid_fitcurve(double * M, vector<int>& p,
 		M_new[i * dim + 2] = d_n;
 	}
 
-	// ÁîÇúÃæ·½³ÌÎªS = ax^2 + bxy + cy^2, Îó²îº¯Êýh = ax^2 + bxy + cy^2 - S
-	// Îó²îÆ½·½ºÍE = sum(h^2), 
-	Matrix A(3, 3), b(3, 1);
-	// E¶ÔaÇóÆ«µ¼
+Matrix A(3, 3), b(3, 1);
+	// Eï¿½ï¿½aï¿½ï¿½Æ«ï¿½ï¿½
 	A.val[0][0] = SumVector(M_new, 4, 0, 0, p.size(), dim);
 	A.val[0][1] = SumVector(M_new, 3, 1, 0, p.size(), dim);
 	A.val[0][2] = SumVector(M_new, 2, 2, 0, p.size(), dim);
 	b.val[0][0] = SumVector(M_new, 2, 0, 1, p.size(), dim);
-	// E¶ÔbÇóÆ«µ¼
+	// Eï¿½ï¿½bï¿½ï¿½Æ«ï¿½ï¿½
 	A.val[1][0] = SumVector(M_new, 3, 1, 0, p.size(), dim);
 	A.val[1][1] = SumVector(M_new, 2, 2, 0, p.size(), dim);
 	A.val[1][2] = SumVector(M_new, 1, 3, 0, p.size(), dim);
 	b.val[1][0] = SumVector(M_new, 1, 1, 1, p.size(), dim);
-	// E¶ÔcÇóÆ«µ¼
+	// Eï¿½ï¿½cï¿½ï¿½Æ«ï¿½ï¿½
 	A.val[2][0] = SumVector(M_new, 2, 2, 0, p.size(), dim);
 	A.val[2][1] = SumVector(M_new, 1, 3, 0, p.size(), dim);
 	A.val[2][2] = SumVector(M_new, 0, 4, 0, p.size(), dim);
 	b.val[2][0] = SumVector(M_new, 0, 2, 1, p.size(), dim);
-	// Çó½âa,b,cµÄÖµ
+	// ï¿½ï¿½ï¿½a,b,cï¿½ï¿½Öµ
 	b.solve(A);
 
-	// ¸ø¶¨ãÐÖµ½øÐÐÂË²¨
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½ï¿½Ë²ï¿½
 	int x = b.val[0][0], y = b.val[1][0], z = b.val[2][0];
 	for (int i = 0; i < p.size(); ++i) {
 		double t = x * pow(M_new[i * dim + 0], 2) + y * M_new[i * dim + 0] * M_new[i * dim + 1]
@@ -161,23 +144,13 @@ void griddivide::grid_fitcurve(double * M, vector<int>& p,
 
 	delete[] M_new;
 }
-
-double* RotateImage(double* M, int num0, int dim, int mode) {		// Ðý×ªÍ¼Ïñ
-	/*double* T = new double[num0 * 3];
-	int index = 0;
-	for (int i = 0; i < num0; ++i) {
-		if (isnan(M[i * dim + 2]))
-			continue;
-		T[index * dim + 0] = M[i * dim + 0];
-		T[index * dim + 1] = M[i * dim + 1];
-		T[index * dim + 2] = M[i * dim + 2];
-		index++;
-	}*/
-	// »ñÈ¡·¨ÏòÁ¿
+// ï¿½ï¿½×ªÍ¼ï¿½ï¿½
+double* RotateImage(double* M, int num0, int dim, int mode) {		
+	// ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	IcpPointToPlane icp(M, num0, dim);
 	double *M_normal = icp.getM_normal();
 
-	// »ñÈ¡Æ½¾ùµã
+	// ï¿½ï¿½È¡Æ½ï¿½ï¿½ï¿½ï¿½
 	double x0 = 0, y0 = 0, z0 = 0;
 	for (int i = 0; i < num0; ++i) {
 		x0 += M[i * dim + 0];
@@ -188,7 +161,7 @@ double* RotateImage(double* M, int num0, int dim, int mode) {		// Ðý×ªÍ¼Ïñ
 	y0 /= num0;
 	z0 /= num0;
 
-	// ÇóËùÓÐµãµ½Æ½¾ùµãµÄ¾àÀë¼°¸ÃµãµÄÈ¨ÖØºÍ×Ü·¨ÏòÁ¿
+	// ï¿½ï¿½ï¿½ï¿½ï¿½Ðµãµ½Æ½ï¿½ï¿½ï¿½ï¿½Ä¾ï¿½ï¿½ë¼°ï¿½Ãµï¿½ï¿½È¨ï¿½Øºï¿½ï¿½Ü·ï¿½ï¿½ï¿½ï¿½ï¿½
 	vector<double> dist(num0, 0), w(num0, 0);
 	double max_dist = 0;
 	vector<double> N(3, 0);
@@ -200,23 +173,18 @@ double* RotateImage(double* M, int num0, int dim, int mode) {		// Ðý×ªÍ¼Ïñ
 			max_dist = temp;
 	}
 	for (int i = 0; i < num0; ++i) {
-		w[i] = (1 - dist[i] / max_dist) + 0.2; // ÈËÎª¶¨ÒåµÄÈ¨ÖØ
-		/*N[0] += M_normal[i * dim + 0] * w[i] / num0;
-		N[1] += M_normal[i * dim + 1] * w[i] / num0;
-		N[2] += M_normal[i * dim + 2] * w[i] / num0;*/
+		w[i] = (1 - dist[i] / max_dist) + 0.2; // ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½ï¿½È¨ï¿½ï¿½
+		N[2] += M_normal[i * dim + 2] * w[i] / num0;
 		N[0] += M_normal[i * dim + 0] / num0;
 		N[1] += M_normal[i * dim + 1] / num0;
 		N[2] += M_normal[i * dim + 2] / num0;
 	}
-	//N[0] -= x0;
-	//N[1] -= y0;
-	//N[2] -= z0;
-	// ÇóÐý×ª½Ç
+	// ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½
 	double Normal_N = norm_p(N);
-	double thetax = asin(N[0] / Normal_N);	// xozÆ½ÃæÐý×ª½Ç
-	double thetay = asin(N[1] / Normal_N);	// yozÆ½ÃæÐý×ª½Ç
+	double thetax = asin(N[0] / Normal_N);	// xozÆ½ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½
+	double thetay = asin(N[1] / Normal_N);	// yozÆ½ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½
 
-	// ½«×ø±ê½øÐÐÐý×ª
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×ª
 	double* M_new = new double[num0 * 3];
 	double x1, y1, z1;
 	for (int i = 0; i < num0; ++i) {
@@ -236,10 +204,8 @@ double* RotateImage(double* M, int num0, int dim, int mode) {		// Ðý×ªÍ¼Ïñ
 	}
 	return M_new;
 }
-
+// ï¿½ï¿½ï¿½ï¿½ï¿½Ð¡ï¿½ä»»
 double* griddivide::gridconvert(double* M, int& num, double* M_c) {
-	//double *M_out = new double[n_x * n_y * dim];
-
 	int count_p = 0;
 	for (int i = 0; i < n_x; ++i) {
 		for (int j = 0; j < n_y; ++j) {
@@ -283,15 +249,15 @@ double* griddivide::first_filter_grid(double* M, int& num_G, int dim, double thr
 		if (point[i].empty()) continue;
 		if (point[i].size() && point[i].size() < 5) {
 			ClearArray(M, point[i], dim);
-			point[i].clear();	//	È¥³ýµÚÒ»ÀàÔëÉùµã
+			point[i].clear();	//	È¥ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		}
-		else {	// Èç¹ûÍø¸ñÄÚÊý¾ÝÁ¿±È½Ï¶àµÄ»°£¬¾Í½øÐÐãÐÖµÉ¸Ñ¡
+		else {	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È½Ï¶ï¿½Ä»ï¿½ï¿½ï¿½ï¿½Í½ï¿½ï¿½ï¿½ï¿½ï¿½ÖµÉ¸Ñ¡
 			grid_fitcurve(M, point[i], threshold, i, dim);
 		}
 	}
 	vector<int> temp_p(point.size(),0);
 
-	int l=label_pointcloud(point, temp_p);	//	¸øµãÔÆÊý¾Ý½øÐÐ±ê¼Ç
+	int l=label_pointcloud(point, temp_p);	//	ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý½ï¿½ï¿½Ð±ï¿½ï¿½
 	vector<int> label_num(l, 0);
 	for(int i=0; i<n_x; i++){
 		for(int j=0; j<n_y; j++){
@@ -308,7 +274,7 @@ double* griddivide::first_filter_grid(double* M, int& num_G, int dim, double thr
 			kk = i;
 	}
 
-	vector<double> tmp;	//	ÁÙÊ±´æ·ÅÊý¾Ý
+	vector<double> tmp;	//	ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	for(int i=0; i<n_x; i++){
 		for(int j=0; j<n_y; j++){
 			for(int k=0; k<n_z; k++) {
@@ -321,7 +287,7 @@ double* griddivide::first_filter_grid(double* M, int& num_G, int dim, double thr
 		}
 	}
 	
-	//	»¹ÐèÒªÆäËûµÄÂË²¨´ëÊ©£¬ËùÒÔÓëÇå³ýµÚ¶þÀàÔëÉùµã·Ö¿ª
+	//	ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ë²ï¿½ï¿½ï¿½Ê©ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¿ï¿½
 	for(int i=0; i<n_x; i++){
 		for(int j=0; j<n_y; j++){
 			for(int k=0; k<n_z; k++) {
@@ -343,6 +309,7 @@ double* griddivide::first_filter_grid(double* M, int& num_G, int dim, double thr
 	return res;
 }
 
+// ï¿½ï¿½Ç·ï¿½È¥ï¿½ï¿½
 int griddivide::label_pointcloud(vector<vector<int>>& point, vector<int>& temp)
 {
 	int label=0;
@@ -368,7 +335,7 @@ int griddivide::label_pointcloud(vector<vector<int>>& point, vector<int>& temp)
 
 void griddivide::label_point(vector<vector<int>> point, vector<int>& temp, int i, int j, int k, queue<int>& point_temp)
 {
-	// ´´½¨¶ÓÁÐ£¬½«·ÃÎÊµ½µÄµã´æÈë¶ÓÁÐ
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Êµï¿½ï¿½Äµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	while (point_temp.size()) {
 		int pos=point_temp.front();
 		point_temp.pop();
@@ -395,13 +362,13 @@ void griddivide::label_point(vector<vector<int>> point, vector<int>& temp, int i
 	}
 }
 
-// ÏòÁ¿µã³Ë
+// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 double dot_product(vector<double> x, vector<double> y)
 {
 	if (x.size() != 3 || y.size() != 3) return 0;
 	return x[0] * y[0] + x[1] * y[1] + x[2] * y[2];
 }
-// ÏòÁ¿²æ³Ë
+// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 vector<double> cross_product(vector<double> x, vector<double> y)
 {
 	vector<double> res(3, 0);
@@ -411,13 +378,13 @@ vector<double> cross_product(vector<double> x, vector<double> y)
 	res[2] = x[0] * y[1] - y[0] * x[1];
 	return res;
 }
-// ÏòÁ¿Ä£
+// ï¿½ï¿½ï¿½ï¿½Ä£
 double norm_p(vector<double> v)
 {
 	if (v.size() != 3) return 0;
 	return sqrt(pow(v[0], 2) + pow(v[1], 2) + pow(v[2], 2));
 }
-// ÏòÁ¿¼Ó·¨
+// ï¿½ï¿½ï¿½ï¿½ï¿½Ó·ï¿½
 vector<double> AddVector(vector<double> v, double num)
 {
 	vector<double> res = v;
@@ -426,7 +393,7 @@ vector<double> AddVector(vector<double> v, double num)
 	res[2] += num;
 	return res;
 }
-// ÏòÁ¿¼õ·¨
+// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 vector<double> SubVector(vector<double> v1, vector<double> v2)
 {
 	vector<double> res = v1;
@@ -435,7 +402,7 @@ vector<double> SubVector(vector<double> v1, vector<double> v2)
 	res[2] -= v2[2];
 	return res;
 }
-// ÏòÁ¿³ý·¨
+// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 vector<double> DivideVector(vector<double> v, double num)
 {
 	vector<double> res = v;
@@ -445,7 +412,7 @@ vector<double> DivideVector(vector<double> v, double num)
 	res[2] /= num;
 	return res;
 }
-// ÇóºÍÆ½¾ùÖµ
+// ï¿½ï¿½ï¿½Æ½ï¿½ï¿½Öµ
 double SumVector(double *M, int i, int j, int k, int N, int dim)
 {
 	double res = 0;
@@ -462,13 +429,13 @@ vector<double> cross_product(vector<double> v, double n)
 	res[2] *= n;
 	return res;
 }
-// ½«Çå³ýµôµÄµãµ½Ô­Êý×éÖÐ¸³NaN
+// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Äµãµ½Ô­ï¿½ï¿½ï¿½ï¿½ï¿½Ð¸ï¿½NaN
 void ClearArray(double *M, vector<int> p, int dim)
 {
 	for (auto c : p)
 		M[c * dim + 2] = NAN;
 }
-// »ñÈ¡zÏò¼ä¸ô×÷ÎªãÐÖµ
+// ï¿½ï¿½È¡zï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½Öµ
 double griddivide::GetInterval()
 {
 	return (max_z - min_z) / (n_z - 1);
@@ -476,26 +443,26 @@ double griddivide::GetInterval()
 
 Matrix fit_plane(double* M, int dim, int num)
 {
-	// Ö±½Ó±©Á¦Çó½â
-	// ÁîAx+By+Cz+D=0£¬Q=(Ax+By+Cz+D)^2£¬Çómin(S=sum(Q))
+	// Ö±ï¿½Ó±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	// ï¿½ï¿½Ax+By+Cz+D=0ï¿½ï¿½Q=(Ax+By+Cz+D)^2ï¿½ï¿½ï¿½ï¿½min(S=sum(Q))
 	// dS/dA = sum(Ax^2+Bxy+Cxz+Dx), dS/dB = sum(Axy+By^2+Cyz+Dy)
 	// dS/dC = sum(Axz+Byz+Cz^2+Dz), dS/dD = sum(Ax+By+Cz+D)
-	// ²»ÄÜÕâÃ´Çó£¬ÕâÑùÇó³öÀ´½âÎª0
-	// ¼Ù¶¨C!=0, ÄÇÃ´¿ÉÒÔ±íÊ¾Îªz=ax+by+c
-	// ÀàËÆÓÚÖ®Ç°µÄÇúÃæÄâºÏ
-	// ÁîS = sum((ax+by+c-z)^2)
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îª0
+	// ï¿½Ù¶ï¿½C!=0, ï¿½ï¿½Ã´ï¿½ï¿½ï¿½Ô±ï¿½Ê¾Îªz=ax+by+c
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö®Ç°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	// ï¿½ï¿½S = sum((ax+by+c-z)^2)
 	Matrix A(3, 3), b(3, 1);
-	// S¶ÔaÇóµ¼
+	// Sï¿½ï¿½aï¿½ï¿½
 	A.val[0][0] = SumVector(M, 2, 0, 0, num, dim);
 	A.val[0][1] = SumVector(M, 1, 1, 0, num, dim);
 	A.val[0][2] = SumVector(M, 1, 0, 0, num, dim);
 	b.val[0][0] = SumVector(M, 1, 0, 1, num, dim);
-	// S¶ÔbÇóµ¼
+	// Sï¿½ï¿½bï¿½ï¿½
 	A.val[1][0] = SumVector(M, 1, 1, 0, num, dim);
 	A.val[1][1] = SumVector(M, 0, 2, 0, num, dim);
 	A.val[1][2] = SumVector(M, 0, 1, 0, num, dim);
 	b.val[1][0] = SumVector(M, 0, 1, 1, num, dim);;
-	// S¶ÔcÇóµ¼
+	// Sï¿½ï¿½cï¿½ï¿½
 	A.val[2][0] = SumVector(M, 1, 0, 0, num, dim);
 	A.val[2][1] = SumVector(M, 0, 1, 0, num, dim);
 	A.val[2][2] = SumVector(M, 0, 0, 0, num, dim);
@@ -505,7 +472,7 @@ Matrix fit_plane(double* M, int dim, int num)
 	return b;
 }
 
-// 2017/04/20ÐÞ¸ÄÍø¸ñ»®·ÖºÍ¾ÛÀà·½·¨
+// 2017/04/20ï¿½Þ¸ï¿½ï¿½ï¿½ï¿½ñ»®·ÖºÍ¾ï¿½ï¿½à·½ï¿½ï¿½
 griddivide_new::griddivide_new(double* M, const int32_t M_num, const int32_t dim)
 	: min_x(DBL_MAX), max_x(-(min_x-1)), min_y(DBL_MAX),
 	  max_y(-(min_y-1)), min_z(DBL_MAX), max_z(-(min_z-1)),
@@ -527,7 +494,7 @@ griddivide_new::griddivide_new(double* M, const int32_t M_num, const int32_t dim
 }
 
 void griddivide_new::gridpoint(double* M, double cubsize) {
-	// cubsizeÎªÍø¸ñµÄ±ß³¤
+	// cubsizeÎªï¿½ï¿½ï¿½ï¿½Ä±ß³ï¿½
 	n_x = (int)((max_x - min_x) / cubsize) + 1;
 	n_y = (int)((max_y - min_y) / cubsize) + 1;
 	n_z = (int)((max_z - min_z) / cubsize) + 1;
@@ -539,24 +506,21 @@ void griddivide_new::gridpoint(double* M, double cubsize) {
 		double z = M[i*dim + 2];
 		if (isnan(z)) continue;
 
-		// ÈýÎ¬¿Õ¼ä³¤a¡¢¿íb¡¢¸ßcµÄ×ø±ê±íÊ¾Îªa+b*nx+c*nx*ny
+		// ï¿½ï¿½Î¬ï¿½Õ¼ä³¤aï¿½ï¿½ï¿½ï¿½bï¿½ï¿½ï¿½ï¿½cï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾Îªa+b*nx+c*nx*ny
 		int grid_x = ((int)((x - min_x) / cubsize));
 		int grid_y = ((int)((y - min_y) / cubsize));
 		int grid_z = ((int)((z - min_z) / cubsize));
-		// µ÷ÊÔËùÓÃ
-		//if (grid_x + grid_y * n_x + grid_z * n_x * n_y >= n_x * n_y * n_z)
-		//	printf("%d %d %d %f %f %f %d %d %d\n", n_x, n_y, n_z, x, y, z, grid_x, grid_y, grid_z);
 		point[grid_x + grid_y * n_x + grid_z * n_x * n_y].push_back(i);
 	}
 }
 
 double* griddivide_new::grid_filter(double* M, int& count, int min_p, int mode) {
-	// mode±íÊ¾ÂË²¨Ä£Ê½£¬1ÊÇ±íÊ¾¾ùÖµ£¬2ÊÇÖ±½ÓÈ¥Ôë
+	// modeï¿½ï¿½Ê¾ï¿½Ë²ï¿½Ä£Ê½ï¿½ï¿½1ï¿½Ç±ï¿½Ê¾ï¿½ï¿½Öµï¿½ï¿½2ï¿½ï¿½Ö±ï¿½ï¿½È¥ï¿½ï¿½
 	vector<vector<double>> m_p;
 	//if (dim != 3)
 	//	return m_p; 
 
-	count = 0; // ¼ÆÊý£¬¼ÇÂ¼ÓÐÓÃµãµÄ¸öÊý
+	count = 0; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½Ãµï¿½Ä¸ï¿½ï¿½ï¿½
 	for (int i = 0; i < n_x * n_y * n_z; ++i) {
 		if (point[i].size() < min_p)
 			continue;
@@ -614,7 +578,7 @@ double* griddivide_new::grid_filter(double* M, int& count, int min_p, int mode) 
 	
 }
 
-// »ñÈ¡·½²î
+// ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½
 double GetVariance(vector<int> num, double aver) {
 	double var = 0;
 	for (int i = 0; i < num.size(); ++i) {
@@ -623,7 +587,7 @@ double GetVariance(vector<int> num, double aver) {
 	var /= (num.size() - 1);
 	return var;
 }
-// »ñÈ¡µãµ½KmeansÖÐµãµÄ¾àÀë×î½üµÄindex
+// ï¿½ï¿½È¡ï¿½ãµ½Kmeansï¿½Ðµï¿½Ä¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½index
 int GetIndexOfKmeans(vector<vector<double>> Kmeans, double* M, int index, int dim) {
 	int res = 0;
 	double temp = 0;
@@ -632,7 +596,7 @@ int GetIndexOfKmeans(vector<vector<double>> Kmeans, double* M, int index, int di
 		double y = M[index * dim + 1];
 		double z = M[index * dim + 2];
 		if (i == 0) {
-			// z·½ÏòµÄ¾àÀëÒª½üµÄ¶à£¬Ö»ÓÃz·½ÏòÀ´×ö¾ÛÀà
+			// zï¿½ï¿½ï¿½ï¿½Ä¾ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½Ä¶à£¬Ö»ï¿½ï¿½zï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 			temp = abs(Kmeans[i][2] - z);
 			res = i;
 		} else {
@@ -645,9 +609,9 @@ int GetIndexOfKmeans(vector<vector<double>> Kmeans, double* M, int index, int di
 	return res;
 }
 
-// ÓÃkmeans¾ÛÀà·½·¨£¬Ò»¹²k¸öÀà
+// ï¿½ï¿½kmeansï¿½ï¿½ï¿½à·½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½kï¿½ï¿½ï¿½ï¿½
 vector<vector<double>> griddivide_new::grid_kmeans(double* M, int k, int num) {
-	// µü´ú100´Î£¬È¡zÏòÏà²î×î´óµÄÎª¾ÛÀàÖÐÐÄ
+	// ï¿½ï¿½ï¿½ï¿½100ï¿½Î£ï¿½È¡zï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	vector<vector<double>> Kmeans(k, vector<double>(3, -1));
 	double temp;
 	for (int i = 0; i < 100; ++i) {
@@ -678,7 +642,7 @@ vector<vector<double>> griddivide_new::grid_kmeans(double* M, int k, int num) {
 		}
 	}
 
-	// ¿ªÊ¼¾ÛÀà£¬¶ÔÀëµÚKÀà×î½üµÄµã
+	// ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½à£¬ï¿½ï¿½ï¿½ï¿½ï¿½Kï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Äµï¿½
 	vector<vector<double>> cluster(k);
 	vector<vector<double>> SumOfCluster(k, vector<double>(2, 0));
 	for (int i = 0; i < num; ++i) {
