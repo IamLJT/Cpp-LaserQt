@@ -83,7 +83,7 @@ void FourthWindow::SetWidgets() {
     gErrorCanvas_03->plotLayout()->insertRow(0);
     gErrorCanvas_03->plotLayout()->addElement(0, 0, new QCPTextElement(gErrorCanvas_03, tr("任意两点间误差图"), QFont(font().family(), 10, QFont::Bold)));
     gErrorCanvas_03->xAxis->setVisible(true);
-    gErrorCanvas_03->xAxis->setTickLabels(false);
+    gErrorCanvas_03->xAxis->setTickLabels(true);
     gErrorCanvas_03->yAxis->setVisible(true);
     gErrorCanvas_03->yAxis->setTickLabels(true);
     gErrorCanvas_03->yAxis->setLabel(tr("误差(m)"));
@@ -191,7 +191,9 @@ void FourthWindow::SetWidgets() {
     setLayout(layout);
 }
 
-void FourthWindow::ClearGraph() {}
+void FourthWindow::ClearGraph() {
+
+}
 
 void FourthWindow::CopyObjectDataFilePath(const QString &path) {
     gObjectDataFile = path;
@@ -655,21 +657,42 @@ void FourthWindow::SlotOK() {
 
         double k = (y_end - y_start) / (x_end - x_start);
 
-        int xIndex, yIndex;
+        int index;
+        bool accordingToX;
         if ((y_end - y_start) > (x_end - x_start)) {
-            xIndex = (y_end - y_start) / 0.01 + 1;
-            yIndex = (x_end - x_start) / 0.01 + 1;
+            index = (y_end - y_start) / 0.01 + 1;
+            accordingToX = false;
         } else {
-            xIndex = (x_end - x_start) / 0.01 + 1;
-            yIndex = (y_end - y_start) / 0.01 + 1;
+            index = (x_end - x_start) / 0.01 + 1;
+            accordingToX = true;
         }
 
+        int xIndex = (x_start - gEstimatorsAccordingToX.at(0)->x) / 0.01 + 1, yIndex = (y_start - gEstimatorsAccordingToY.at(0)->y) / 0.01 + 1;
         double x, y;
-        for (int i = 0; i < xIndex; ++i) {
-            for (int j = 0; j < yIndex; ++j) {
-
+        int m, n;
+        vector<vector<int>> dataIndex;
+        if (accordingToX) {
+            for (int i = 0; i < index; ++i) {
+                y = i * 0.01 * k + y_start;
+                n = int((y - y_start) / 0.01) + 1 + yIndex;
+                m = i + xIndex;
+                dataIndex.push_back(vector<int>{m, n});
+            }
+        } else {
+            for (int i = 0; i < index; ++i) {
+                x = i * 0.01 / k + x_start;
+                m = int((x - x_start) / 0.01) + 1 + xIndex;
+                n = i + yIndex;
+                dataIndex.push_back(vector<int>{m, n});
             }
         }
+
+        gErrorCanvas_03->clearGraphs();
+        for (size_t i = 0; i < dataIndex.size(); ++i) {
+            gErrorCanvas_03->graph(0)->addData(i, g2DErrorMatrix[dataIndex.at(i).at(0)][dataIndex.at(i).at(1)]);
+        }
+        gErrorCanvas_03->xAxis->setRange(0, dataIndex.size());
+        gErrorCanvas_03->replot();
 
         for (int i = 0; i < ceil(xDim); ++i) {
             delete [] g2DErrorMatrix[i];

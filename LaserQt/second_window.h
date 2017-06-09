@@ -56,6 +56,7 @@ private:
     int16_t gProcessMachinePort;
     QHostAddress gHostAddress;
     QUdpSocket * gUDPSocket;
+    int gPathIndex_;
     bool recvDone;
 
     void CreateMainWindow();

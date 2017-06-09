@@ -16,6 +16,7 @@ MainWindow::~MainWindow() {
 void MainWindow::clear() {
     gInputFile->clear();
     gDataTable->clearContents();
+    gDataTable->setRowCount(0);
     gEditButton->setEnabled(false);
     gUpdateButton->setEnabled(false);
     ClearGraph();

@@ -22,6 +22,7 @@ SecondWindow::~SecondWindow() {
     delete gTaskQueue;
     delete gTaskList;
     delete gTimer;
+    delete gUDPSocket;
 }
 
 void SecondWindow::clear() {
@@ -32,9 +33,14 @@ void SecondWindow::clear() {
     gReduction->clear();
     gThermalParameter->clear();
     gProcessingTime->setText("00:00:00");
+    gCounter = 0;
+    delete gUDPSocket;
+    gUDPSocket = NULL;
+    gPathIndex_ = 0;
     while (!gTaskQueue->empty()) {
         gTaskQueue->dequeue();
     }
+    gTaskList->clear();
     gLogger->clear();
     gStartProcessingButton->setEnabled(false);
     gStopProcessingButton->setEnabled(false);
@@ -240,7 +246,8 @@ void SecondWindow::InitSocket() {
 }
 
 void SecondWindow::ClearGraph() {
-    gCustomPlot->clearGraphs();
+    // gCustomPlot->graph(0)->;
+    // gCustomPlot->graph(1)->;
     gCustomPlot->xAxis->setTickLabels(false);
     gCustomPlot->yAxis->setTickLabels(false);
     gCustomPlot->replot();
@@ -300,6 +307,7 @@ void SecondWindow::SlotStartProcessing() {
             Sleep(10);  // 设置适当的延时
         }
         gTimer->start(1000);  // 开始加工计时
+        gPathIndex_ = 0;
     }
 }
 
@@ -319,6 +327,7 @@ void SecondWindow::SlotStopProcessing() {
     }
 
     gIsStop = true;
+    gTimer->stop();  // 停止加工计时
 }
 
 /*
@@ -335,6 +344,7 @@ void SecondWindow::SlotContinueProcessing() {
     }
 
     gIsStop = false;
+    gTimer->start(1000);  // 开始加工计时
 }
 
 /*
@@ -372,7 +382,6 @@ void SecondWindow::SlotUpdateTime() {
  * 处理接收的数据包，数据包格式 [实时X坐标，实时Y坐标，路径编号，正反标志]
  */
 void SecondWindow::SlotReadPendingDatagrams() {
-    static int pathIndex_ = 0;
     while (gUDPSocket->hasPendingDatagrams()) {
         QByteArray datagram;
         datagram.resize(gUDPSocket->pendingDatagramSize());
@@ -397,10 +406,10 @@ void SecondWindow::SlotReadPendingDatagrams() {
             msgBox.exec();
         }
         else {
-            if (pathIndex != pathIndex_) {
-                pathIndex_ = pathIndex;
-                QVector<double> dataCell = gTaskList->at(pathIndex_ - 1);
-                if (pathIndex_ == 1) {
+            if (pathIndex != gPathIndex_) {
+                gPathIndex_ = pathIndex;
+                QVector<double> dataCell = gTaskList->at(gPathIndex_ - 1);
+                if (gPathIndex_ == 1) {
                     gLogger->append(tr("[+] 正在处理第") + QString::number(dataCell.at(0)) + ("项任务..."));
                 } else {
                     gLogger->append(tr("[+] 第") + QString::number(dataCell.at(0) - 1) + ("项任务处理完毕."));
