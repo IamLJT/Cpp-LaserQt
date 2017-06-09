@@ -8,4 +8,4 @@
 #include "GridDivide.h"
 
 int PointCloudKThreshlod(const char * Path);
-void PointCloudFitting(const char * inPath, bool isFilter, const char * TargetData);
+int PointCloudFitting(const char * inPath, bool isFilter, const char * TargetData);

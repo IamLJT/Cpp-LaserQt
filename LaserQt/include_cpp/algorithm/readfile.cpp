@@ -101,7 +101,7 @@ void ReadxyzFile(const char* Path) {
 }
 
 // 读取普通的txt
-double* ReadFile(const char* strPath, int& num_p, int& dim_p, int mode)	 {
+double* ReadFile(const char* strPath, int& num_p, int& dim_p, int mode, bool& result)	 {
 	FILE *fp;
 	fp = fopen(strPath, "r");
 	std::vector<double> vec;
@@ -109,11 +109,18 @@ double* ReadFile(const char* strPath, int& num_p, int& dim_p, int mode)	 {
 	double idata1, idata2, idata3;
 	if (fp != NULL) {
 		printf("success to open file\n");
+		result = true;
 		while(!feof(fp)) {
-			if (mode == 1) //	读取txt文件，格式是每行x,y,z\n或者x,y,z
-				fscanf(fp, "%lf,%lf,%lf", &idata1, &idata2, &idata3);
-			else if (mode == 2) //	读取txt文件，格式是每行x y z\n或者x y z
-				fscanf(fp, "%lf %lf %lf", &idata1, &idata2, &idata3);
+			if (mode == 1) { //	读取txt文件，格式是每行x,y,z
+				if(fscanf(fp, "%lf,%lf,%lf", &idata1, &idata2, &idata3)!=dim) {
+					result = false; return NULL;
+				}
+			}
+			else if (mode == 2) { //	读取txt文件，格式是每行x y z
+				if(fscanf(fp, "%lf %lf %lf", &idata1, &idata2, &idata3)!=dim) {
+					result = false; return NULL;
+				}
+			}
 			vec.push_back(idata1);
 			vec.push_back(idata2);
 			vec.push_back(idata3);
@@ -122,6 +129,8 @@ double* ReadFile(const char* strPath, int& num_p, int& dim_p, int mode)	 {
 	}
 	else {
 		printf("failed to open file\n");
+		result = false;
+		return NULL;
 	}
 	
 	num_p = num;
@@ -130,8 +139,7 @@ double* ReadFile(const char* strPath, int& num_p, int& dim_p, int mode)	 {
 	double *M = new double[(int)vec.size()];
 	for(int i=0; i<(int)vec.size(); i++)
 		M[i]=vec[i];
-	// 清理工作
-	vec.clear(); fclose(fp);
+	fclose(fp);
 	return M;
 }
 

@@ -214,7 +214,20 @@ void ThirdWindow::SlotDenoisePointCloudData() {
     const char * path = gScanningDataFile->text().toStdString().c_str();
     int noise = PointCloudKThreshlod(path);
     MyMessageBox msgBox;
-    msgBox.setText(tr("本次点云去噪总计去除") + QString::number(noise) + tr("个噪声点！"));
+    switch(noise) {
+    case -1:
+        msgBox.setText(tr("扫描文件读取失败，请确定路径和格式是否正确！"));
+        break;
+    case -2:
+        msgBox.setText(tr("简化网格划分尺寸设置不当，请修改！"));
+        break;
+    case -3:
+        msgBox.setText(tr("去噪网格划分尺寸设置不当，请修改！"));
+        break;
+    default:
+        msgBox.setText(tr("本次点云去噪总计去除") + QString::number(noise) + tr("个噪声点！"));
+        break;
+    }
     msgBox.setStandardButtons(QMessageBox::Save);
     msgBox.exec();
 }
@@ -223,7 +236,14 @@ void ThirdWindow::SlotFitPointCloudData() {
     const char * inpath = gScanningDataFile->text().toStdString().c_str();
     bool isFilter = true;
     const char * TargetPath = gObjectDataFile->text().toStdString().c_str();
-    PointCloudFitting(inpath, isFilter, TargetPath);
+    int flag = PointCloudFitting(inpath, isFilter, TargetPath);
+    if (flag == -1 || flag == -2) {
+        MyMessageBox msgBox;
+        if (flag == -1) msgBox.setText(tr("目标文件读取失败，请确定路径和格式是否正确！"));
+        if (flag == -2) msgBox.setText(tr("拟合文件读取失败，请确定路径和格式是否正确！"));
+        msgBox.setStandardButtons(QMessageBox::Save);
+        msgBox.exec();
+    }
 
     series1->setMeshSmooth(QtDataVisualization::QAbstract3DSeries::MeshPoint);
     QtDataVisualization::QScatterDataArray data1;
