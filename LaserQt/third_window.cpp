@@ -1,4 +1,5 @@
 #include "third_window.h"
+#include "QDebug"
 
 ThirdWindow::ThirdWindow(QWidget *parent) :
     QWidget(parent) {
@@ -160,6 +161,32 @@ void ThirdWindow::SlotOpenObjectDataFile() {
     QString filePath = QFileDialog::getOpenFileName(this, tr("选择文件"), QString::fromStdString(GetWorkDirectory()), tr("Text File(*.txt)"));
     if (filePath != "") {
         gObjectDataFile->setText(filePath);
+
+        /* Python Script */
+        QString PythonScript;
+
+        QFile fd(":/xml/xml/faro.xml");
+        if (fd.open(QFile::ReadOnly | QFile::Text)) {
+            QXmlStreamReader * reader = new QXmlStreamReader(&fd);
+            while (!reader->atEnd()) {
+                reader->readNext();
+                if (reader->name() == "Script") {
+                    PythonScript = reader->readElementText();
+                }
+            }
+            delete reader;
+            fd.close();
+        }
+        QStringList args;
+        args.append(PythonScript);
+        args.append("-f");
+        args.append(filePath);
+        QProcess * proc = new QProcess;
+        proc->execute("python", args);
+        delete proc;
+        proc = NULL;
+        /* Python Script */
+
         gPointCloudDataScanningButton->setEnabled(true);
     }
 }
@@ -211,39 +238,39 @@ void ThirdWindow::SlotScanPointCloudData() {
 }
 
 void ThirdWindow::SlotDenoisePointCloudData() {
-    const char * path = gScanningDataFile->text().toStdString().c_str();
-    int noise = PointCloudKThreshlod(path);
-    MyMessageBox msgBox;
-    switch(noise) {
-    case -1:
-        msgBox.setText(tr("扫描文件读取失败，请确定路径和格式是否正确！"));
-        break;
-    case -2:
-        msgBox.setText(tr("简化网格划分尺寸设置不当，请修改！"));
-        break;
-    case -3:
-        msgBox.setText(tr("去噪网格划分尺寸设置不当，请修改！"));
-        break;
-    default:
-        msgBox.setText(tr("本次点云去噪总计去除") + QString::number(noise) + tr("个噪声点！"));
-        break;
-    }
-    msgBox.setStandardButtons(QMessageBox::Save);
-    msgBox.exec();
+//    const char * path = gScanningDataFile->text().toStdString().c_str();
+//    int noise = PointCloudKThreshlod(path);
+//    MyMessageBox msgBox;
+//    switch (noise) {
+//        case -1:
+//            msgBox.setText(tr("扫描文件读取失败，请确定路径和格式是否正确！"));
+//            break;
+//        case -2:
+//            msgBox.setText(tr("简化网格划分尺寸设置不当，请修改！"));
+//            break;
+//        case -3:
+//            msgBox.setText(tr("去噪网格划分尺寸设置不当，请修改！"));
+//            break;
+//        default:
+//            msgBox.setText(tr("本次点云去噪总计去除") + QString::number(noise) + tr("个噪声点！"));
+//            break;
+//    }
+//    msgBox.setStandardButtons(QMessageBox::Save);
+//    msgBox.exec();
 }
 
 void ThirdWindow::SlotFitPointCloudData() {
-    const char * inpath = gScanningDataFile->text().toStdString().c_str();
-    bool isFilter = true;
-    const char * TargetPath = gObjectDataFile->text().toStdString().c_str();
-    int flag = PointCloudFitting(inpath, isFilter, TargetPath);
-    if (flag == -1 || flag == -2) {
-        MyMessageBox msgBox;
-        if (flag == -1) msgBox.setText(tr("目标文件读取失败，请确定路径和格式是否正确！"));
-        if (flag == -2) msgBox.setText(tr("拟合文件读取失败，请确定路径和格式是否正确！"));
-        msgBox.setStandardButtons(QMessageBox::Save);
-        msgBox.exec();
-    }
+//    const char * inpath = gScanningDataFile->text().toStdString().c_str();
+//    bool isFilter = true;
+//    const char * TargetPath = gObjectDataFile->text().toStdString().c_str();
+//    int flag = PointCloudFitting(inpath, isFilter, TargetPath);
+//    if (flag == -1 || flag == -2) {
+//        MyMessageBox msgBox;
+//        if (flag == -1) msgBox.setText(tr("目标文件读取失败，请确定路径和格式是否正确！"));
+//        else if (flag == -2) msgBox.setText(tr("拟合文件读取失败，请确定路径和格式是否正确！"));
+//        msgBox.setStandardButtons(QMessageBox::Save);
+//        msgBox.exec();
+//    }
 
     series1->setMeshSmooth(QtDataVisualization::QAbstract3DSeries::MeshPoint);
     QtDataVisualization::QScatterDataArray data1;
@@ -263,7 +290,7 @@ void ThirdWindow::SlotFitPointCloudData() {
 
     series2->setMeshSmooth(QtDataVisualization::QAbstract3DSeries::MeshSphere);
     QtDataVisualization::QScatterDataArray data2;
-    QFile f2("E:/FittingData.txt");  // TODO
+    QFile f2("D:/FittingData.txt");  // TODO
     if (f2.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QTextStream txtInput(&f2);
         QString line;

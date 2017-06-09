@@ -446,8 +446,8 @@ void FourthWindow::PlotX(const qint32 &split) {
         errorCanvas.at(i)->yAxis->setRange(0, 0.1);
         errorCanvas.at(i)->replot();
 
-        errorCanvas.at(i)->saveJpg("D:/LaserQtCache/水平方向" + QString::number(i + 1) + "_" + QString::number(split) + "处误差图.jpg", 488, 485, 1, -1);  // TODO
-        gErrorImages << "D:/LaserQtCache/水平方向" + QString::number(i + 1) + "_" + QString::number(split) + "处误差图.jpg";
+        errorCanvas.at(i)->savePng("D:/LaserQtCache/水平方向" + QString::number(i + 1) + "_" + QString::number(split) + "处误差图.png", 488, 485, 1, -1);  // TODO
+        gErrorImages << "D:/LaserQtCache/水平方向" + QString::number(i + 1) + "_" + QString::number(split) + "处误差图.png";
     }
 
     for (size_t i = 0; i < errorCanvas.size(); ++i) {
@@ -503,8 +503,8 @@ void FourthWindow::PlotY(const qint32 &split) {
         errorCanvas.at(i)->yAxis->setRange(0, 0.1);
         errorCanvas.at(i)->replot();
 
-        errorCanvas.at(i)->saveJpg("D:/LaserQtCache/垂直方向" + QString::number(i + 1) + "_" + QString::number(split) + "处误差图.jpg", 488, 485, 1, -1);  // TODO
-        gErrorImages << "D:/LaserQtCache/垂直方向" + QString::number(i + 1) + "_" + QString::number(split) + "处误差图.jpg";
+        errorCanvas.at(i)->savePng("D:/LaserQtCache/垂直方向" + QString::number(i + 1) + "_" + QString::number(split) + "处误差图.png", 488, 485, 1, -1);  // TODO
+        gErrorImages << "D:/LaserQtCache/垂直方向" + QString::number(i + 1) + "_" + QString::number(split) + "处误差图.png";
     }
 
     for (size_t i = 0; i < errorCanvas.size(); ++i) {

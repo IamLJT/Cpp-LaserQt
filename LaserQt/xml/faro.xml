@@ -2,4 +2,5 @@
 <faro>
 <FAROSDKDemoApp>D:/FARO/FAROSDKDemoApp/Debug.x64/FAROSDKDemoApp.exe</FAROSDKDemoApp>
 <FAROOpenDemoApp>D:/FARO/FAROOpenDemoApp/x64/Debug/FAROOpenDemoApp.exe</FAROOpenDemoApp>
+<Script>D:/FARO/Process.py</Script>
 </faro>

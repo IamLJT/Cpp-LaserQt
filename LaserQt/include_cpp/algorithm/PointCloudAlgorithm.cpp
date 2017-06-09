@@ -62,7 +62,7 @@ int PointCloudKThreshlod(const char * Path) {
 	// 如果去噪后点云数据num_G为0，则说明网格有问题，与上面划分时问题相同
 	if (num_G == 0) return -3;
 
-	char sPath[MAX] = "E:\\TempData.txt";
+	char sPath[MAX] = "D:\\TempData.txt";
     WriteFile(sPath, M_e0, num_G, dim);
 	
 	// 删除动态申请的内存
@@ -74,7 +74,7 @@ int PointCloudKThreshlod(const char * Path) {
 }
 
 int PointCloudFitting(const char *inPath, bool isFilter, const char *TargetData) {
-	char Path[MAX] = "E:\\TempData.txt";
+	char Path[MAX] = "D:\\TempData.txt";
 	int32_t dim = 3, num = 0, num0 = 0;
 	double *M;
 	bool isread = true;
@@ -114,7 +114,7 @@ int PointCloudFitting(const char *inPath, bool isFilter, const char *TargetData)
 	}
 
 	// 保存输出数据
-	char OutPath[MAX] = "E:\\FittingData.txt";
+	char OutPath[MAX] = "D:\\FittingData.txt";
 	WriteFile(OutPath, M0, num, dim);
 	
 	// 删除动态申请的内存
